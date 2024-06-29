@@ -14,53 +14,73 @@ import {
 import { FIREBASE_AUTH } from "../FirebaseConfig";
 import BirthdayPicker from "../components/BirthdayPicker";
 import { useProfileData } from "./Profile";
+import ProfileHeader from "../components/ProfileHeader";
 
 const ProfileCreation = () => {
-  const profileImgSrc = "../fake-cdn/users/18058079144/profile.jpg"; // This needs to be changed to a default pic
   const { defaultData, profileData, setProfileData, updateProfile } =
     useProfileData();
   const [loading, setLoading] = useState(false);
-  const [profileCompleted, setProfileCompleted] = useState(true);
+  const [invalidFields, setInvalidFields] = useState({
+    firstName: false,
+    lastName: false,
+    title: false,
+    location: false,
+    birthday: false,
+  });
 
   // Create a verification function to go through each user input before setting initialized to true
   const checkInputs = () => {
-    if (
-      (profileData.firstName == defaultData.firstName) |
-      (profileData.firstName == "") |
-      (profileData.firstName == null)
-    ) {
-      // Change the placeholder text to colored
-      setProfileCompleted(false);
+    let isValid = true;
+    const newInvalidFields = {
+      firstName: false,
+      lastName: false,
+      title: false,
+      location: false,
+      birthday: false,
+    };
+
+    if (profileData) {
+      if (
+        profileData.firstName == defaultData.firstName ||
+        profileData.firstName == "" ||
+        profileData.firstName == null
+      ) {
+        newInvalidFields.firstName = true;
+        isValid = false;
+      }
+      if (profileData.lastName == null) {
+        newInvalidFields.lastName = true;
+        isValid = false;
+      }
+      if (
+        profileData.title === defaultData.title ||
+        profileData.title === "" ||
+        profileData.title == null
+      ) {
+        newInvalidFields.title = true;
+        isValid = false;
+      }
+      if (
+        profileData.location === defaultData.location ||
+        profileData.location === "" ||
+        profileData.location == null
+      ) {
+        newInvalidFields.location = true;
+        isValid = false;
+      }
+      if (
+        profileData.birthday === defaultData.birthday ||
+        profileData.birthday === "" ||
+        profileData.birthday == null
+      ) {
+        newInvalidFields.birthday = true;
+        isValid = false;
+      }
     }
-    if (profileData.lastName == null) {
-      // Change the placeholder text to colored
-      setProfileCompleted(false);
-    }
-    if (
-      (profileData.title == defaultData.title) |
-      (profileData.title == "") |
-      (profileData.title == null)
-    ) {
-      // Change the placeholder text to colored
-      setProfileCompleted(false);
-    }
-    if (
-      (profileData.location == defaultData.location) |
-      (profileData.location == "") |
-      (profileData.location == null)
-    ) {
-      // Change the placeholder text to colored
-      setProfileCompleted(false);
-    }
-    if (
-      (profileData.birthday == defaultData.birthday) |
-      (profileData.birthday == "") |
-      (profileData.birthday == null)
-    ) {
-      // Change the placeholder text to colored
-      setProfileCompleted(false);
-    }
-    if (profileCompleted) {
+
+    setInvalidFields(newInvalidFields);
+
+    if (isValid) {
       setProfileData((prev) => ({ ...prev, initialized: true }));
       return true;
     } else {
@@ -68,7 +88,7 @@ const ProfileCreation = () => {
     }
   };
 
-  const handleProfileCreation = async () => {
+  const handleProfileCreation = () => {
     setLoading(true);
 
     try {
@@ -93,39 +113,7 @@ const ProfileCreation = () => {
         <ActivityIndicator size="large" color="#00FFFF" />
       ) : (
         <View style={styles.container}>
-          <View style={styles.profileHeader}>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "flex-start",
-              }}
-            >
-              <Image
-                style={styles.profileImage}
-                source={require(profileImgSrc)}
-              />
-              <View style={styles.nameLocation}>
-                <Text style={styles.name}>
-                  {profileData.firstName} {profileData.lastName}
-                </Text>
-                <Text style={styles.location}>{profileData.location}</Text>
-              </View>
-            </View>
-          </View>
-          <ScrollView
-            horizontal={true}
-            showsHorizontalScrollIndicator={false}
-            style={styles.descriptionTab}
-            contentContainerStyle={styles.descriptionTabContent}
-          >
-            <View style={[styles.tab, styles.age]}>
-              <Text style={styles.age}>{profileData.age}</Text>
-            </View>
-            <View style={[styles.tab, styles.work]}>
-              <Text style={styles.work}>{profileData.title}</Text>
-            </View>
-            {/* <ProfileLinks /> */}
-          </ScrollView>
+          <ProfileHeader />
 
           <ScrollView
             style={styles.descriptorsContainer}
@@ -134,47 +122,9 @@ const ProfileCreation = () => {
             contentContainerStyle={styles.descriptorsContainer}
           >
             <View style={styles.descriptorView}>
-              <Text style={styles.descriptor}>First Name</Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={(text) =>
-                  setProfileData((prev) => ({ ...prev, firstName: text }))
-                }
-                placeholder="Add First Name"
-              />
-            </View>
-            <View style={styles.descriptorView}>
-              <Text style={styles.descriptor}>Last Name</Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={(text) =>
-                  setProfileData((prev) => ({ ...prev, lastName: text }))
-                }
-                placeholder="Add Last Name"
-              />
-            </View>
-            <View style={styles.descriptorView}>
-              <Text style={styles.descriptor}>Title</Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={(text) =>
-                  setProfileData((prev) => ({ ...prev, title: text }))
-                }
-                placeholder="Add Title"
-              />
-            </View>
-            <View style={styles.descriptorView}>
-              <Text style={styles.descriptor}>Location</Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={(text) =>
-                  setProfileData((prev) => ({ ...prev, location: text }))
-                }
-                placeholder="Add Location"
-              />
-            </View>
-            <View style={styles.descriptorView}>
-              <Text style={styles.descriptor}>Phone Number</Text>
+              <Text style={[styles.descriptor, styles.phoneNumber]}>
+                Phone Number
+              </Text>
               <TextInput
                 style={[styles.input, styles.phoneNumber]}
                 onChangeText={(text) =>
@@ -185,13 +135,61 @@ const ProfileCreation = () => {
               />
             </View>
             <View style={styles.descriptorView}>
+              <Text style={styles.descriptor}>First Name</Text>
+              <TextInput
+                style={[
+                  styles.input,
+                  invalidFields.location && styles.invalidInput,
+                ]}
+                onChangeText={(text) =>
+                  setProfileData((prev) => ({ ...prev, firstName: text }))
+                }
+                placeholder="Add First Name"
+              />
+            </View>
+            <View style={styles.descriptorView}>
+              <Text style={styles.descriptor}>Last Name</Text>
+              <TextInput
+                style={[
+                  styles.input,
+                  invalidFields.location && styles.invalidInput,
+                ]}
+                onChangeText={(text) =>
+                  setProfileData((prev) => ({ ...prev, lastName: text }))
+                }
+                placeholder="Add Last Name"
+              />
+            </View>
+            <View style={styles.descriptorView}>
+              <Text style={styles.descriptor}>Title</Text>
+              <TextInput
+                style={[
+                  styles.input,
+                  invalidFields.location && styles.invalidInput,
+                ]}
+                onChangeText={(text) =>
+                  setProfileData((prev) => ({ ...prev, title: text }))
+                }
+                placeholder="Add Title"
+              />
+            </View>
+            <View style={styles.descriptorView}>
+              <Text style={styles.descriptor}>Location</Text>
+              <TextInput
+                style={[
+                  styles.input,
+                  invalidFields.location && styles.invalidInput,
+                ]}
+                onChangeText={(text) =>
+                  setProfileData((prev) => ({ ...prev, location: text }))
+                }
+                placeholder="Add Location"
+              />
+            </View>
+            <View style={styles.descriptorView}>
               <Text style={styles.descriptor}>Birthday</Text>
               <BirthdayPicker updateProfile={updateProfile} initDate={""} />
             </View>
-            {/* <View style={styles.descriptorView}>
-                            <Text style={styles.descriptor}>Links</Text>
-                            <TextInput style={styles.input}>{profileData.links}</TextInput>
-                        </View> */}
 
             <Pressable
               style={({ pressed }) => [
@@ -221,65 +219,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "black",
   },
-  profileHeader: {
-    display: "flex",
-    flexDirection: "row",
-    width: "100%",
-    paddingVertical: 10,
-    paddingHorizontal: 13,
-  },
-  profileImage: {
-    width: 56,
-    height: 56,
-    borderRadius: 40,
-  },
-  nameLocation: {
-    paddingLeft: 20,
-    alignSelf: "center",
-  },
-  name: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  location: {
-    fontSize: 16,
-  },
-  descriptionTab: {
-    flexWrap: "nowrap",
-    gap: 8,
-    marginBottom: 10,
-    flexGrow: 0,
-    flexShrink: 1,
-  },
-  descriptionTabContent: {
-    paddingHorizontal: 12,
-  },
-  tab: {
-    paddingHorizontal: 16,
-    marginHorizontal: 4,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
   descriptorsContainer: {
     flex: 1,
-  },
-  age: {
-    fontSize: 16,
-    color: "white",
-    backgroundColor: "black",
-    alignSelf: "center",
-  },
-  work: {
-    fontSize: 16,
-    color: "black",
-    backgroundColor: "#F6F6F6",
-    alignSelf: "center",
-  },
-  link: {
-    fontSize: 16,
-    color: "#4200FF",
-    backgroundColor: "#F6F6F6",
-    alignSelf: "center",
   },
   descriptorView: {
     paddingHorizontal: 12,
@@ -308,6 +249,9 @@ const styles = StyleSheet.create({
     // ":focus": {
     //   outline: "none",
     // },
+  },
+  invalidInput: {
+    placeholderTextColor: "#4200FF",
   },
   phoneNumber: {
     color: "rgba(0,0,0,0.43)",

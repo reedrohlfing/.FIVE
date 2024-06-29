@@ -7,27 +7,15 @@ import {
   ScrollView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useProfileData } from "../pages/Profile";
 
 // TODO: User should be pulled after sign-in
-import ProfileData from "../fake-cdn/users/18058079144/profile.json";
 const profileImgSrc = "../fake-cdn/users/18058079144/profile.jpg";
-const profile = ProfileData;
 
 export default function ProfileHeader() {
   const navigation = useNavigation();
-  const ProfileLinks = () => {
-    return profile.links.map((link, index) => {
-      return (
-        <Pressable
-          key={index}
-          style={[styles.tab, styles.link]}
-          onPress={() => Linking.openURL(link.url)}
-        >
-          <Text style={styles.link}>{link.title}</Text>
-        </Pressable>
-      );
-    });
-  };
+  const { defaultData, profileData, setProfileData, updateProfile } =
+    useProfileData();
 
   return (
     <div>
@@ -36,11 +24,12 @@ export default function ProfileHeader() {
           <Image style={styles.profileImage} source={require(profileImgSrc)} />
           <View style={styles.nameLocation}>
             <Text style={styles.name}>
-              {profile.firstName} {profile.lastName}
+              {profileData.firstName} {profileData.lastName}
             </Text>
-            <Text style={styles.location}>{profile.location}</Text>
+            <Text style={styles.location}>{profileData.location}</Text>
           </View>
         </View>
+        {/* TODO: Change this if user is on create Profile or within Settings page */}
         <Pressable
           style={{ alignSelf: "center", marginStart: "auto" }}
           onPress={() => navigation.navigate("Settings")}
@@ -59,13 +48,27 @@ export default function ProfileHeader() {
         contentContainerStyle={styles.descriptionTabContent}
       >
         <View style={[styles.tab, styles.age]}>
-          <Text style={styles.age}>{profile.age}</Text>
+          <Text style={styles.age}>{profileData.age}</Text>
         </View>
         <View style={[styles.tab, styles.work]}>
-          <Text style={styles.work}>{profile.title}</Text>
+          <Text style={styles.work}>{profileData.title}</Text>
         </View>
+        {profileData.school && profileData.school !== defaultData.school && (
+          <View style={[styles.tab, styles.school]}>
+            <Text style={styles.school}>{profileData.school}</Text>
+          </View>
+        )}
 
-        <ProfileLinks />
+        {profileData.linkURL &&
+          profileData.linkURL &&
+          profileData.linkURL !== defaultData.linkURL && (
+            <Pressable
+              style={[styles.tab, styles.link]}
+              onPress={() => Linking.openURL(profileData.linkURL)}
+            >
+              <Text style={styles.link}>{profileData.linkTitle} ↗</Text>
+            </Pressable>
+          )}
       </ScrollView>
     </div>
   );
@@ -93,7 +96,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   location: {
-    fontSize: 14,
+    fontSize: 16,
   },
   button: {
     width: 33,
@@ -101,10 +104,11 @@ const styles = StyleSheet.create({
   },
   descriptionTab: {
     flexWrap: "nowrap",
-    gap: 8,
-    marginBottom: 10,
     flexGrow: 0,
     flexShrink: 1,
+    gap: 8,
+    marginBottom: 10,
+    minHeight: 34,
   },
   descriptionTabContent: {
     paddingHorizontal: 12,
@@ -116,19 +120,25 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   age: {
-    fontSize: 14,
+    fontSize: 16,
     color: "white",
     backgroundColor: "black",
     alignSelf: "center",
   },
   work: {
-    fontSize: 14,
+    fontSize: 16,
+    color: "black",
+    backgroundColor: "#F6F6F6",
+    alignSelf: "center",
+  },
+  school: {
+    fontSize: 16,
     color: "black",
     backgroundColor: "#F6F6F6",
     alignSelf: "center",
   },
   link: {
-    fontSize: 14,
+    fontSize: 16,
     color: "#4200FF",
     backgroundColor: "#F6F6F6",
     alignSelf: "center",

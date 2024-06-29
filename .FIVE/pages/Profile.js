@@ -16,7 +16,8 @@ const useProfileData = () => {
     birthday: "",
     title: "Title",
     school: "",
-    links: [null],
+    linkTitle: "",
+    linkURL: "",
     initialized: false,
   };
   const [profileData, setProfileData] = useState(defaultData);
@@ -61,7 +62,7 @@ const useProfileData = () => {
     fetchProfileData();
   }, []);
 
-  return { profileData, setProfileData, updateProfile };
+  return { defaultData, profileData, setProfileData, updateProfile };
 };
 
 const ImageComponent = ({ image, size }) => {
