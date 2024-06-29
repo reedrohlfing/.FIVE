@@ -1,0 +1,41 @@
+:root {
+  --PhoneInputCountryFlag-borderColor: transparent;
+  --PhoneInputCountrySelectArrow-color: white;
+}
+
+.PhoneInputInput {
+  height: 45px;
+  border-radius: 30px;
+  border: none;
+  padding: 15px;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 1);
+  font-size: 20px;
+  font-weight: bold;
+  outline: none;
+}
+
+.auth-code-input {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.auth-code-input input {
+  width: 40px;
+  height: 60px;
+  border-radius: 30px;
+  /* border: 1px solid rgb(0, 255, 255); */
+  border: none;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 1);
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.auth-code-input input:focus {
+  background-color: rgba(255, 255, 255, 0.8);
+}
