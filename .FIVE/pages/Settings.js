@@ -2,20 +2,15 @@ import {
   StyleSheet,
   Text,
   View,
-  Image,
   SafeAreaView,
   ScrollView,
   Pressable,
   TextInput,
-  Linking,
 } from "react-native";
-import { FIREBASE_AUTH, FIREBASE_DB } from "../FirebaseConfig";
+import { FIREBASE_AUTH } from "../FirebaseConfig";
 import BirthdayPicker from "../components/BirthdayPicker";
-import { useProfileData } from "./Profile";
+import { useProfileData } from "../ProfileContext";
 import ProfileHeader from "../components/ProfileHeader";
-
-// TODO: User img should be pulled after sign-in
-const profileImgSrc = "../fake-cdn/users/18058079144/profile.jpg";
 
 const Settings = () => {
   const { defaultData, profileData, setProfileData, updateProfile } =
@@ -136,6 +131,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+    paddingTop: 10,
   },
   descriptorsContainer: {
     flex: 1,

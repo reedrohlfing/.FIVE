@@ -1,7 +1,7 @@
 import { StatusBar, StyleSheet, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { AuthProvider, useAuth } from "./AuthContext";
+import { ProfileProvider, useProfileData } from "./ProfileContext";
 
 import { Login } from "./pages/Login";
 import { NavBar } from "./components/NavBar";
@@ -29,7 +29,7 @@ function InsideLayout() {
 }
 
 function AppNavigator() {
-  const { user, isProfileSetUp } = useAuth();
+  const { user, isProfileSetUp } = useProfileData();
 
   return (
     <NavigationContainer>
@@ -65,9 +65,9 @@ function AppNavigator() {
 
 export default function App() {
   return (
-    <AuthProvider>
+    <ProfileProvider>
       <AppNavigator />
-    </AuthProvider>
+    </ProfileProvider>
   );
 }
 

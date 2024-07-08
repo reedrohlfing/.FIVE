@@ -10,15 +10,14 @@ import {
 } from "react-native";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { FIREBASE_AUTH, FIREBASE_DB } from "../FirebaseConfig";
-import firebase from "firebase/app";
-import "react-phone-number-input/style.css";
 import PhoneInput from "react-phone-number-input";
 import AuthCode from "react-auth-code-input";
 import { doc, getDoc, setDoc } from "firebase/firestore";
+import firebase from "firebase/app";
+import "react-phone-number-input/style.css";
 import "../assets/css/authentication.css";
 
 const Login = ({ navigation }) => {
-  const auth = FIREBASE_AUTH;
   const [phoneNumber, setPhoneNumber] = useState("");
   const [confirmResult, setConfirmResult] = useState(null);
   const [verificationCode, setVerificationCode] = useState("");
@@ -28,13 +27,16 @@ const Login = ({ navigation }) => {
   useEffect(() => {
     if (!window.recaptchaVerifier) {
       window.recaptchaVerifier = new RecaptchaVerifier(
-        auth,
+        FIREBASE_AUTH,
         "recaptcha-container",
         {
           size: "invisible",
           callback: (response) => {
             // reCAPTCHA solved, allow signInWithPhoneNumber.
-            //   onSignInSubmit();
+          },
+          "expired-callback": () => {
+            // Response expired. Ask user to solve reCAPTCHA again.
+            Alert.alert("Error", "reCAPTCHA expired, please try again.");
           },
         }
       );
@@ -52,7 +54,7 @@ const Login = ({ navigation }) => {
     // Attempt to use Firebase to sign in with phone number entered
     try {
       const result = await signInWithPhoneNumber(
-        auth,
+        FIREBASE_AUTH,
         phoneNumber,
         window.recaptchaVerifier
       );

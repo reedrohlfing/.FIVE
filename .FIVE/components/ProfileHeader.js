@@ -6,14 +6,12 @@ import {
   Pressable,
   ScrollView,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { useProfileData } from "../pages/Profile";
+import { useProfileData } from "../ProfileContext";
 
 // TODO: User should be pulled after sign-in
 const profileImgSrc = "../fake-cdn/users/18058079144/profile.jpg";
 
 export default function ProfileHeader() {
-  const navigation = useNavigation();
   const { defaultData, profileData, setProfileData, updateProfile } =
     useProfileData();
 
@@ -29,16 +27,6 @@ export default function ProfileHeader() {
             <Text style={styles.location}>{profileData.location}</Text>
           </View>
         </View>
-        {/* TODO: Change this if user is on create Profile or within Settings page */}
-        <Pressable
-          style={{ alignSelf: "center", marginStart: "auto" }}
-          onPress={() => navigation.navigate("Settings")}
-        >
-          <Image
-            style={[styles.button]}
-            source={require("../assets/icons/settings-black-inactive.png")}
-          />
-        </Pressable>
       </View>
 
       <ScrollView
@@ -59,16 +47,14 @@ export default function ProfileHeader() {
           </View>
         )}
 
-        {profileData.linkURL &&
-          profileData.linkURL &&
-          profileData.linkURL !== defaultData.linkURL && (
-            <Pressable
-              style={[styles.tab, styles.link]}
-              onPress={() => Linking.openURL(profileData.linkURL)}
-            >
-              <Text style={styles.link}>{profileData.linkTitle} ↗</Text>
-            </Pressable>
-          )}
+        {profileData.linkURL && profileData.linkURL !== defaultData.linkURL && (
+          <Pressable
+            style={[styles.tab, styles.link]}
+            onPress={() => Linking.openURL(profileData.linkURL)}
+          >
+            <Text style={styles.link}>{profileData.linkTitle} ↗</Text>
+          </Pressable>
+        )}
       </ScrollView>
     </div>
   );
@@ -97,10 +83,6 @@ const styles = StyleSheet.create({
   },
   location: {
     fontSize: 16,
-  },
-  button: {
-    width: 33,
-    height: 33,
   },
   descriptionTab: {
     flexWrap: "nowrap",

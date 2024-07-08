@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   View,
   Text,
-  Image,
   TextInput,
   Pressable,
   StyleSheet,
@@ -13,7 +12,7 @@ import {
 } from "react-native";
 import { FIREBASE_AUTH } from "../FirebaseConfig";
 import BirthdayPicker from "../components/BirthdayPicker";
-import { useProfileData } from "./Profile";
+import { useProfileData } from "../ProfileContext";
 import ProfileHeader from "../components/ProfileHeader";
 
 const ProfileCreation = () => {
@@ -48,7 +47,7 @@ const ProfileCreation = () => {
         newInvalidFields.firstName = true;
         isValid = false;
       }
-      if (profileData.lastName == null) {
+      if (profileData.lastName == "" || profileData.lastName == null) {
         newInvalidFields.lastName = true;
         isValid = false;
       }
@@ -77,7 +76,6 @@ const ProfileCreation = () => {
         isValid = false;
       }
     }
-
     setInvalidFields(newInvalidFields);
 
     if (isValid) {
@@ -98,11 +96,10 @@ const ProfileCreation = () => {
       } else {
         console.log("Please fill out all fields in profile.");
         // TODO: Functionality if not all fields are completed
+        setLoading(false);
       }
     } catch (error) {
       Alert.alert("Error creating new profile!", error.message);
-    } finally {
-      setLoading(false);
     }
   };
 
