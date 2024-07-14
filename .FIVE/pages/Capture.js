@@ -1,6 +1,6 @@
 import { CameraView, useCameraPermissions } from "expo-camera";
 import MaskedView from "@react-native-masked-view/masked-view";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Button,
   StyleSheet,
@@ -12,43 +12,49 @@ import {
 } from "react-native";
 
 const Capture = () => {
-  const [facing, setFacing] = useState("back");
-  const [permission, requestPermission] = useCameraPermissions();
+  // const [facing, setFacing] = useState("back");
+  // const [permission, requestPermission] = useCameraPermissions();
 
-  if (!permission) {
-    // Camera permissions are still loading.
-    return <View />;
-  }
+  // if (!permission) {
+  //   // Camera permissions are still loading.
+  //   return <View />;
+  // }
 
-  if (!permission.granted) {
-    // Camera permissions are not granted yet.
-    return (
-      <View style={styles.container}>
-        <Text style={{ textAlign: "center" }}>
-          We need your permission to show the camera
-        </Text>
-        <Button onPress={requestPermission} title="grant permission" />
-      </View>
-    );
-  }
+  // if (!permission.granted) {
+  //   // Camera permissions are not granted yet.
+  //   return (
+  //     <View style={styles.container}>
+  //       <Text style={{ textAlign: "center" }}>
+  //         We need your permission to show the camera
+  //       </Text>
+  //       <Button onPress={requestPermission} title="grant permission" />
+  //     </View>
+  //   );
+  // }
 
-  function toggleCameraFacing() {
-    setFacing((current) => (current === "back" ? "front" : "back"));
-  }
+  // function toggleCameraFacing() {
+  //   setFacing((current) => (current === "back" ? "front" : "back"));
+  // }
 
   return (
     <SafeAreaView style={styles.container}>
-      <MaskedView
+      {/* <MaskedView
         style={styles.cameraFrame}
         maskElement={<View style={styles.transparentCircle}></View>}
       >
-        <CameraView style={styles.camera} facing={facing} zoom={0}></CameraView>
+        <iframe src="..." allow="camera;">
+          <CameraView
+            style={styles.camera}
+            facing={facing}
+            zoom={0}
+          ></CameraView>
+        </iframe>
       </MaskedView>
       <View style={styles.buttonContainer}>
         <Pressable style={styles.button} onPress={toggleCameraFacing}>
           <Text style={styles.text}>Flip Camera</Text>
         </Pressable>
-      </View>
+      </View> */}
     </SafeAreaView>
   );
 };

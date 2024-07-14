@@ -1,5 +1,6 @@
-import { StyleSheet, Text, View, Image } from "react-native";
+import { StyleSheet, Image } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { useProfileData } from "../ProfileContext";
 import { Feed } from "../pages/Feed";
 import { Search } from "../pages/Search";
 import { Capture } from "../pages/Capture";
@@ -9,6 +10,7 @@ import { Profile } from "../pages/Profile";
 const Tab = createBottomTabNavigator();
 
 const NavBar = () => {
+  const { profileData } = useProfileData();
   return (
     <Tab.Navigator
       styles={styles.navigator}
@@ -41,8 +43,8 @@ const NavBar = () => {
               style={styles.button}
               source={
                 focused
-                  ? require("../assets/icons/search-black-active.png")
-                  : require("../assets/icons/search-black-inactive.png")
+                  ? require("../assets/icons/bubbles-black-active.png")
+                  : require("../assets/icons/bubbles-black-inactive.png")
               }
             />
           ),
@@ -89,12 +91,12 @@ const NavBar = () => {
           tabBarShowLabel: false,
           tabBarIcon: ({ focused }) => (
             <Image
-              style={styles.button}
-              source={
+              style={
                 focused
-                  ? require("../assets/icons/bubbles-black-active.png")
-                  : require("../assets/icons/bubbles-black-inactive.png")
+                  ? [styles.button, styles.profileActive]
+                  : [styles.button, styles.profileInactive]
               }
+              source={profileData.profileImage}
             />
           ),
         }}
@@ -109,8 +111,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   button: {
-    width: 33,
-    height: 33,
+    width: 32,
+    height: 32,
+  },
+  profileInactive: {
+    borderRadius: "50%",
+    border: "none",
+  },
+  profileActive: {
+    border: "1.5px solid black",
+    borderRadius: "50%",
   },
 });
 

@@ -10,7 +10,8 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
-import { FIREBASE_AUTH } from "../FirebaseConfig";
+import { doc, deleteDoc } from "firebase/firestore";
+import { FIREBASE_AUTH, FIREBASE_DB } from "../FirebaseConfig";
 import BirthdayPicker from "../components/BirthdayPicker";
 import { useProfileData } from "../ProfileContext";
 import ProfileHeader from "../components/ProfileHeader";
@@ -103,6 +104,16 @@ const ProfileCreation = () => {
     }
   };
 
+  const handleCancelProfile = () => {
+    setLoading(true);
+    // Delete profile information from Firebase Database
+    const docRef = doc(FIREBASE_DB, "users", FIREBASE_AUTH.currentUser.uid);
+    deleteDoc(docRef);
+
+    FIREBASE_AUTH.signOut();
+    setLoading(false);
+  };
+
   return (
     <SafeAreaView style={[styles.container, StyleSheet.absoluteFill]}>
       <Text style={styles.title}>Create Your Profile</Text>
@@ -111,7 +122,6 @@ const ProfileCreation = () => {
       ) : (
         <View style={styles.container}>
           <ProfileHeader />
-
           <ScrollView
             style={styles.descriptorsContainer}
             vertical={true}
@@ -119,7 +129,7 @@ const ProfileCreation = () => {
             contentContainerStyle={styles.descriptorsContainer}
           >
             <View style={styles.descriptorView}>
-              <Text style={[styles.descriptor, styles.phoneNumber]}>
+              <Text style={[styles.descriptor, styles.phoneDesc]}>
                 Phone Number
               </Text>
               <TextInput
@@ -127,7 +137,11 @@ const ProfileCreation = () => {
                 onChangeText={(text) =>
                   setProfileData((prev) => ({ ...prev, phoneNumber: text }))
                 }
-                defaultValue={FIREBASE_AUTH.currentUser.phoneNumber}
+                defaultValue={
+                  FIREBASE_AUTH.currentUser
+                    ? FIREBASE_AUTH.currentUser.phoneNumber
+                    : ""
+                }
                 readOnly={true}
               />
             </View>
@@ -188,15 +202,24 @@ const ProfileCreation = () => {
               <BirthdayPicker updateProfile={updateProfile} initDate={""} />
             </View>
 
-            <Pressable
-              style={({ pressed }) => [
-                styles.submitButton,
-                pressed && { backgroundColor: "rgba(0, 155, 155, 1)" },
-              ]}
-              onPress={handleProfileCreation}
-            >
-              <Text style={styles.submitButtonText}>Done</Text>
-            </Pressable>
+            <View style={styles.twoButtons}>
+              <Pressable
+                style={[styles.tab, styles.cancelButton]}
+                onPress={handleCancelProfile}
+              >
+                <Text style={styles.buttonText}>Cancel</Text>
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.tab,
+                  styles.submitButton,
+                  pressed && { backgroundColor: "rgba(0, 155, 155, 1)" },
+                ]}
+                onPress={handleProfileCreation}
+              >
+                <Text style={styles.submitButtonText}>Done</Text>
+              </Pressable>
+            </View>
           </ScrollView>
         </View>
       )}
@@ -250,23 +273,38 @@ const styles = StyleSheet.create({
   invalidInput: {
     placeholderTextColor: "#4200FF",
   },
+  phoneDesc: {
+    color: "rgba(0,0,0,0.43)",
+  },
   phoneNumber: {
     color: "rgba(0,0,0,0.43)",
   },
+  tab: {
+    paddingHorizontal: 16,
+    marginHorizontal: 4,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
   submitButton: {
     backgroundColor: "#00FFFF",
-    borderRadius: 20,
-    marginVertical: 40,
-    paddingVertical: 4,
-    paddingHorizontal: 16,
-    marginHorizontal: "auto",
-    justifyContent: "center",
-    alignItems: "center",
-    width: "max-content",
+    // marginHorizontal: "auto",
+    // justifyContent: "center",
+    // alignItems: "center",
+    // width: "max-content",
   },
   submitButtonText: {
     color: "black",
     textAlign: "center",
+  },
+  cancelButton: {
+    backgroundColor: "#F6F6F6",
+  },
+  twoButtons: {
+    display: "flex",
+    flexDirection: "row",
+    gap: 16,
+    justifyContent: "center",
+    paddingVertical: 48,
   },
 });
 

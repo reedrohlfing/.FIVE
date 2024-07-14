@@ -5,21 +5,91 @@ import {
   Image,
   Pressable,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
+import { useState } from "react";
 import { useProfileData } from "../ProfileContext";
-
-// TODO: User should be pulled after sign-in
-const profileImgSrc = "../fake-cdn/users/18058079144/profile.jpg";
+import * as ImagePicker from "expo-image-picker";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { doc, updateDoc } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { FIREBASE_STORAGE, FIREBASE_DB } from "../FirebaseConfig";
 
 export default function ProfileHeader() {
   const { defaultData, profileData, setProfileData, updateProfile } =
     useProfileData();
+  const [loadingImage, setLoadingImage] = useState(false);
+
+  const handleImagePicker = async () => {
+    // Request media library permissions
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      alert("Sorry, we need camera roll permissions to make this work!");
+      return;
+    }
+
+    // Launch the image picker
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0,
+    });
+
+    if (!result.canceled) {
+      setLoadingImage(true);
+      const imageUri = result.assets[0].uri;
+      const userID = getAuth().currentUser.uid;
+      const storageRef = ref(FIREBASE_STORAGE, `user/${userID}/profileImage`);
+
+      const response = await fetch(imageUri);
+      const blob = await response.blob();
+
+      // TODO: Add a loader while image uploads
+      uploadBytes(storageRef, blob, {
+        metadata: {
+          customMetadata: {
+            author_uid: userID,
+          },
+        },
+      })
+        .then(async (snapshot) => {
+          const downloadURL = await getDownloadURL(snapshot.ref);
+          await updateDoc(doc(FIREBASE_DB, "users", userID), {
+            profileImage: downloadURL,
+          });
+          setProfileData({ ...profileData, profileImage: downloadURL });
+          updateProfile({ profileImage: downloadURL });
+        })
+        .then(() => {
+          setLoadingImage(false);
+        })
+        .catch((error) => {
+          console.error("Error uploading image: ", error);
+          setLoadingImage(false);
+        });
+    }
+  };
 
   return (
     <div>
       <View style={styles.profileHeader}>
         <View style={{ flexDirection: "row", justifyContent: "flex-start" }}>
-          <Image style={styles.profileImage} source={require(profileImgSrc)} />
+          <Pressable onPress={handleImagePicker}>
+            {loadingImage ? (
+              <ActivityIndicator
+                style={styles.profileImage}
+                size="large"
+                color="#00FFFF"
+              />
+            ) : (
+              <Image
+                style={styles.profileImage}
+                source={profileData.profileImage}
+              />
+            )}
+          </Pressable>
+
           <View style={styles.nameLocation}>
             <Text style={styles.name}>
               {profileData.firstName} {profileData.lastName}
@@ -42,7 +112,7 @@ export default function ProfileHeader() {
           <Text style={styles.work}>{profileData.title}</Text>
         </View>
         {profileData.school && profileData.school !== defaultData.school && (
-          <View style={[styles.tab, styles.school]}>
+          <View style={[styles.tab, styles.schoolContainer]}>
             <Text style={styles.school}>{profileData.school}</Text>
           </View>
         )}
@@ -72,6 +142,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 40,
+    margin: 1,
   },
   nameLocation: {
     paddingLeft: 20,
@@ -113,10 +184,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#F6F6F6",
     alignSelf: "center",
   },
+  schoolContainer: {
+    backgroundColor: "#F6F6F6",
+  },
   school: {
     fontSize: 16,
     color: "black",
-    backgroundColor: "#F6F6F6",
     alignSelf: "center",
   },
   link: {

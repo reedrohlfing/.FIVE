@@ -86,7 +86,7 @@ const Login = ({ navigation }) => {
       const userDoc = await getDoc(userDocRef);
 
       if (!userDoc.exists()) {
-        setDoc(
+        await setDoc(
           userDocRef,
           { phoneNumber: user.phoneNumber, initialized: false },
           { merge: true }
