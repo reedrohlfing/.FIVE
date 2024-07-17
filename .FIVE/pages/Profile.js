@@ -1,19 +1,75 @@
 import {
   StyleSheet,
+  View,
   Image,
   ScrollView,
   SafeAreaView,
   Pressable,
+  Dimensions,
 } from "react-native";
+import { useState, useEffect, useCallback } from "react";
 import ProfileHeader from "../components/ProfileHeader";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import "firebase/storage";
+import { ref, listAll, getDownloadURL } from "firebase/storage";
+import { FIREBASE_STORAGE, FIREBASE_AUTH } from "../FirebaseConfig";
 
-const ImageComponent = ({ image, size }) => {
+const GridImageCircles = ({ navigation }) => {
+  const [circles, setCircles] = useState([]);
+  const size = Dimensions.get("window").width / 2.4;
+
+  const fetchImages = async () => {
+    try {
+      const userId = FIREBASE_AUTH.currentUser.uid;
+      const postsRef = ref(FIREBASE_STORAGE, `user/${userId}/posts`);
+      const listResponse = await listAll(postsRef);
+      const imageRefs = listResponse.items.reverse(); // Start with the newest at the top
+
+      const imageUrls = await Promise.all(
+        imageRefs.map((imageRef) => getDownloadURL(imageRef))
+      );
+
+      const newCircles = imageUrls.map((image) => ({
+        size,
+        uri: image,
+        userId,
+      }));
+      setCircles(newCircles);
+    } catch (error) {
+      console.error("Error fetching images: ", error);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchImages();
+    }, [])
+  );
+
+  const handleBubblePress = (post) => {
+    navigation.navigate("PostModal", { post });
+  };
+
   return (
-    <Image
-      style={[styles.bubble, { height: size, width: size }]}
-      source={image}
-    />
+    <View style={styles.gridContainer}>
+      {circles.map((circle, index) => (
+        <Pressable
+          key={index}
+          style={styles.gridItem}
+          onPress={() => handleBubblePress(circle)}
+        >
+          <Image
+            source={{ uri: circle.uri }}
+            style={{
+              width: circle.size,
+              height: circle.size,
+              borderRadius: circle.size / 2,
+              backgroundColor: "#F6F6F6",
+            }}
+          />
+        </Pressable>
+      ))}
+    </View>
   );
 };
 
@@ -27,7 +83,7 @@ const Profile = () => {
         onPress={() => navigation.navigate("Settings")}
       >
         <Image
-          style={[styles.button]}
+          style={styles.button}
           source={require("../assets/icons/settings-black-inactive.png")}
         />
       </Pressable>
@@ -36,26 +92,7 @@ const Profile = () => {
         style={styles.bubblesScroll}
         contentContainerStyle={styles.bubblesContainer}
       >
-        <ImageComponent
-          image={require("../fake-cdn/images/blacks.jpg")}
-          size={75}
-        />
-        <ImageComponent
-          image={require("../fake-cdn/images/croatia.jpg")}
-          size={150}
-        />
-        <ImageComponent
-          image={require("../fake-cdn/images/green.jpg")}
-          size={200}
-        />
-        <ImageComponent
-          image={require("../fake-cdn/images/f1.jpg")}
-          size={300}
-        />
-        <ImageComponent
-          image={require("../fake-cdn/images/tennis.jpg")}
-          size={112}
-        />
+        <GridImageCircles navigation={navigation} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -77,17 +114,21 @@ const styles = StyleSheet.create({
   },
   bubblesScroll: {
     flex: 1,
-    backgroundColor: "#F6F6F6",
+    backgroundColor: "white",
   },
   bubblesContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
+    paddingVertical: 10,
   },
-  bubble: {
-    maxHeight: 402,
-    maxWidth: 402,
-    borderRadius: 9000,
-    margin: 6,
+  gridContainer: {
+    display: "flex",
+    flexWrap: "wrap",
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+  },
+  gridItem: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 12,
   },
 });
 

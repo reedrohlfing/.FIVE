@@ -23,15 +23,6 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    },
-    "plugins": [
-      [
-        "expo-camera",
-        {
-          "cameraPermission": "Allow .FIVE to access your camera",
-          "recordAudioAndroid": true
-        }
-      ]
-    ]
+    }
   }
 }

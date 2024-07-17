@@ -29,8 +29,9 @@ const styles = StyleSheet.create({
   feedBubble: {
     width: screenWidth,
     height: screenWidth,
-    borderRadius: 9000,
+    borderRadius: "50%",
     alignSelf: "center",
+    backgroundColor: "#F6F6F6",
   },
   postTitle: {
     display: "flex",
@@ -43,8 +44,9 @@ const styles = StyleSheet.create({
   profileImage: {
     width: 37,
     height: 37,
-    borderRadius: 9000,
+    borderRadius: "50%",
     alignSelf: "center",
+    backgroundColor: "#F6F6F6",
   },
   profileName: {
     fontWeight: "bold",

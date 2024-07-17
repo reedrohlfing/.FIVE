@@ -82,12 +82,6 @@ const styles = StyleSheet.create({
     width: "100%",
     marginHorizontal: 13,
   },
-  feedBubble: {
-    width: screenWidth,
-    height: screenWidth,
-    borderRadius: 9000,
-    alignSelf: "center",
-  },
 });
 
 export { Feed };

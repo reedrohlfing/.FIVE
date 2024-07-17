@@ -6,14 +6,14 @@ import {
   Pressable,
   ScrollView,
   ActivityIndicator,
+  Linking,
 } from "react-native";
 import { useState } from "react";
 import { useProfileData } from "../ProfileContext";
 import * as ImagePicker from "expo-image-picker";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { doc, updateDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-import { FIREBASE_STORAGE, FIREBASE_DB } from "../FirebaseConfig";
+import { FIREBASE_STORAGE } from "../FirebaseConfig";
 
 export default function ProfileHeader() {
   const { defaultData, profileData, setProfileData, updateProfile } =
@@ -45,7 +45,6 @@ export default function ProfileHeader() {
       const response = await fetch(imageUri);
       const blob = await response.blob();
 
-      // TODO: Add a loader while image uploads
       uploadBytes(storageRef, blob, {
         metadata: {
           customMetadata: {
@@ -55,11 +54,7 @@ export default function ProfileHeader() {
       })
         .then(async (snapshot) => {
           const downloadURL = await getDownloadURL(snapshot.ref);
-          await updateDoc(doc(FIREBASE_DB, "users", userID), {
-            profileImage: downloadURL,
-          });
-          setProfileData({ ...profileData, profileImage: downloadURL });
-          updateProfile({ profileImage: downloadURL });
+          await updateProfile({ profileImage: downloadURL });
         })
         .then(() => {
           setLoadingImage(false);
@@ -89,7 +84,6 @@ export default function ProfileHeader() {
               />
             )}
           </Pressable>
-
           <View style={styles.nameLocation}>
             <Text style={styles.name}>
               {profileData.firstName} {profileData.lastName}
@@ -105,10 +99,10 @@ export default function ProfileHeader() {
         style={styles.descriptionTab}
         contentContainerStyle={styles.descriptionTabContent}
       >
-        <View style={[styles.tab, styles.age]}>
+        <View style={[styles.tab, styles.ageContainer]}>
           <Text style={styles.age}>{profileData.age}</Text>
         </View>
-        <View style={[styles.tab, styles.work]}>
+        <View style={[styles.tab, styles.workContainer]}>
           <Text style={styles.work}>{profileData.title}</Text>
         </View>
         {profileData.school && profileData.school !== defaultData.school && (
@@ -116,10 +110,9 @@ export default function ProfileHeader() {
             <Text style={styles.school}>{profileData.school}</Text>
           </View>
         )}
-
         {profileData.linkURL && profileData.linkURL !== defaultData.linkURL && (
           <Pressable
-            style={[styles.tab, styles.link]}
+            style={[styles.tab, styles.linkContainer]}
             onPress={() => Linking.openURL(profileData.linkURL)}
           >
             <Text style={styles.link}>{profileData.linkTitle} ↗</Text>
@@ -172,16 +165,20 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 16,
   },
+  ageContainer: {
+    backgroundColor: "black",
+  },
   age: {
     fontSize: 16,
     color: "white",
-    backgroundColor: "black",
     alignSelf: "center",
+  },
+  workContainer: {
+    backgroundColor: "#F6F6F6",
   },
   work: {
     fontSize: 16,
     color: "black",
-    backgroundColor: "#F6F6F6",
     alignSelf: "center",
   },
   schoolContainer: {
@@ -192,10 +189,12 @@ const styles = StyleSheet.create({
     color: "black",
     alignSelf: "center",
   },
+  linkContainer: {
+    backgroundColor: "#F6F6F6",
+  },
   link: {
     fontSize: 16,
     color: "#4200FF",
-    backgroundColor: "#F6F6F6",
     alignSelf: "center",
   },
 });

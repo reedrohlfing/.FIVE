@@ -38,17 +38,22 @@ const Settings = () => {
       const userId = user.uid;
 
       // Delete photos from Firebase Storage
-      const storageRef = ref(FIREBASE_STORAGE, `user/${userId}`);
-      const images = await listAll(storageRef);
-      const imageRefs = images.items;
+      const profileImageRef = ref(
+        FIREBASE_STORAGE,
+        `user/${userId}/profileImage`
+      );
+      if (profileImageRef) {
+        deleteObject(profileImageRef);
+      }
+      const postsRef = ref(FIREBASE_STORAGE, `user/${userId}/posts`);
+      const posts = await listAll(postsRef);
+      const imageRefs = posts.items;
 
-      Promise.all(imageRefs.map((imageRef) => deleteObject(imageRef)))
-        .then(() => {
-          console.log("Folder deleted successfully");
-        })
-        .catch((error) => {
-          console.error("Error deleting folder:", error);
-        });
+      Promise.all(imageRefs.map((imageRef) => deleteObject(imageRef))).catch(
+        (error) => {
+          console.error("Error deleting posts folder:", error);
+        }
+      );
 
       // Delete profile information from Firebase Database
       const docRef = doc(FIREBASE_DB, "users", userId);

@@ -11,7 +11,12 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { doc, deleteDoc } from "firebase/firestore";
-import { FIREBASE_AUTH, FIREBASE_DB } from "../FirebaseConfig";
+import { ref, deleteObject } from "firebase/storage";
+import {
+  FIREBASE_AUTH,
+  FIREBASE_DB,
+  FIREBASE_STORAGE,
+} from "../FirebaseConfig";
 import BirthdayPicker from "../components/BirthdayPicker";
 import { useProfileData } from "../ProfileContext";
 import ProfileHeader from "../components/ProfileHeader";
@@ -104,12 +109,23 @@ const ProfileCreation = () => {
     }
   };
 
-  const handleCancelProfile = () => {
+  const handleCancelProfile = async () => {
     setLoading(true);
     // Delete profile information from Firebase Database
     const docRef = doc(FIREBASE_DB, "users", FIREBASE_AUTH.currentUser.uid);
-    deleteDoc(docRef);
+    await deleteDoc(docRef);
 
+    // Check to see if they uploaded a profile Image, and delete it
+    const userId = FIREBASE_AUTH.currentUser.uid;
+    const profileImageRef = ref(
+      FIREBASE_STORAGE,
+      `user/${userId}/profileImage`
+    );
+    if (profileImageRef) {
+      deleteObject(profileImageRef);
+    }
+
+    // Log out of app
     FIREBASE_AUTH.signOut();
     setLoading(false);
   };

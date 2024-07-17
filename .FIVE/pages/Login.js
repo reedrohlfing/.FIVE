@@ -109,7 +109,7 @@ const Login = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>.FIVE</Text>
+      <Text style={styles.title}>Bubs</Text>
       <View id="recaptcha-container" />
       {!confirmResult ? (
         <View style={styles.phoneSubmitView}>
