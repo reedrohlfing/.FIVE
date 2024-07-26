@@ -27,6 +27,7 @@ const defaultData = {
   linkURL: "",
   initialized: false,
   profileImage: require("./assets/icons/add-black-active.png"),
+  buds: [],
 };
 
 const fetchProfileData = async (userId, setProfileData) => {

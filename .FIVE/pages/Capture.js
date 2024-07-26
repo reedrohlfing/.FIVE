@@ -9,7 +9,9 @@ import {
   ActivityIndicator,
   Dimensions,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
+import moment from "moment";
 import { useProfileData } from "../ProfileContext";
 import * as ImagePicker from "expo-image-picker";
 import {
@@ -18,10 +20,12 @@ import {
   uploadBytes,
   deleteObject,
 } from "firebase/storage";
-import { getAuth } from "firebase/auth";
-import { FIREBASE_STORAGE } from "../FirebaseConfig";
-import moment from "moment";
-import { useNavigation } from "@react-navigation/native";
+import { doc, setDoc } from "firebase/firestore";
+import {
+  FIREBASE_STORAGE,
+  FIREBASE_DB,
+  FIREBASE_AUTH,
+} from "../FirebaseConfig";
 
 const Capture = () => {
   const { defaultData, profileData, setProfileData, updateProfile } =
@@ -50,8 +54,8 @@ const Capture = () => {
     if (!result.canceled) {
       setLoadingImage(true);
       const imageUri = result.assets[0].uri;
-      const userID = getAuth().currentUser.uid;
-      const dateNow = moment().format("DDMMMYYYY HHmmss");
+      const userID = FIREBASE_AUTH.currentUser.uid;
+      const dateNow = moment().format("YYYYMMDD_HHmmss");
       const uploadFilename = `user/${userID}/posts/${dateNow}`;
       const postRef = ref(FIREBASE_STORAGE, uploadFilename);
 
@@ -69,7 +73,7 @@ const Capture = () => {
           const downloadURL = await getDownloadURL(snapshot.ref);
           await updateProfile({
             tempUploadURL: downloadURL,
-            tempUploadTitle: uploadFilename,
+            tempUploadTitle: dateNow,
           });
           setLoadingImage(false);
         })
@@ -82,15 +86,30 @@ const Capture = () => {
         });
     }
   };
+
   const handleCancelPost = () => {
     setPostLoaded(false);
     // Remove the post from Storage
     const postRef = ref(FIREBASE_STORAGE, profileData.tempUploadTitle);
     deleteObject(postRef);
   };
+
   const handlePost = () => {
     // TODO: Create some animation for when a user posts photo
     setPostLoaded(false);
+
+    // Add post to post pool
+    const userID = FIREBASE_AUTH.currentUser.uid;
+    const postData = {
+      userId: userID,
+      postURL: profileData.tempUploadURL,
+      datetime: profileData.tempUploadTitle,
+    };
+    let docName = userID + "_" + profileData.tempUploadTitle;
+    let postPoolRef = doc(FIREBASE_DB, "posts", docName);
+    setDoc(postPoolRef, postData);
+
+    // Finally navigate to Feed tab once posting is complete
     navigation.navigate("Feed");
   };
 
@@ -157,7 +176,9 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     justifyContent: "center",
     height: screenWidth,
+    maxHeight: 474,
     width: screenWidth,
+    maxWidth: 474,
     backgroundColor: "#00FFFF",
   },
   uploadButtonPressed: {
@@ -177,7 +198,9 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     justifyContent: "center",
     height: screenWidth,
+    maxHeight: 474,
     width: screenWidth,
+    maxWidth: 474,
   },
   twoButtons: {
     display: "flex",

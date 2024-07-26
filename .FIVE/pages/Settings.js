@@ -12,8 +12,15 @@ import {
   FIREBASE_STORAGE,
   FIREBASE_DB,
 } from "../FirebaseConfig";
-import { ref, deleteObject, listAll } from "firebase/storage";
-import { doc, deleteDoc } from "firebase/firestore";
+import { ref, deleteObject, listAll, getDownloadURL } from "firebase/storage";
+import {
+  doc,
+  deleteDoc,
+  collection,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 import BirthdayPicker from "../components/BirthdayPicker";
 import { useProfileData } from "../ProfileContext";
 import ProfileHeader from "../components/ProfileHeader";
@@ -34,26 +41,57 @@ const Settings = () => {
 
   const deleteAccount = async () => {
     try {
-      const user = FIREBASE_AUTH.currentUser;
-      const userId = user.uid;
+      const userId = profileData.userId;
 
       // Delete photos from Firebase Storage
       const profileImageRef = ref(
         FIREBASE_STORAGE,
         `user/${userId}/profileImage`
       );
-      if (profileImageRef) {
-        deleteObject(profileImageRef);
-      }
-      const postsRef = ref(FIREBASE_STORAGE, `user/${userId}/posts`);
-      const posts = await listAll(postsRef);
+      getDownloadURL(profileImageRef)
+        .then(() => {
+          // File exists, delete it
+          deleteObject(profileImageRef);
+        })
+        .catch((error) => {
+          // File doesn't exist, handle the error or do nothing
+          if (error.code === "storage/object-not-found") {
+            // File doesn't exist, do nothing
+            console.log("No profile image when deleting account.");
+          }
+        });
+      const postsImgRef = ref(FIREBASE_STORAGE, `user/${userId}/posts`);
+      const posts = await listAll(postsImgRef);
       const imageRefs = posts.items;
 
       Promise.all(imageRefs.map((imageRef) => deleteObject(imageRef))).catch(
         (error) => {
-          console.error("Error deleting posts folder:", error);
+          console.error("Error deleting image posts folder:", error);
         }
       );
+
+      // Delete posts from Firebase Database
+      const postsRef = collection(FIREBASE_DB, "posts");
+      const postQuery = query(postsRef, where("userId", "==", userId));
+      getDocs(postQuery)
+        .then((snapshot) => {
+          if (snapshot.size > 0) {
+            // If posts exist, delete them
+            Promise.all(snapshot.docs.map((doc) => deleteDoc(doc.ref)))
+              .then(() => {
+                console.log("Posts deleted successfully");
+              })
+              .catch((error) => {
+                console.error("Error deleting posts:", error);
+              });
+          } else {
+            // No posts exist, do nothing
+            console.log("No posts to delete.");
+          }
+        })
+        .catch((error) => {
+          console.error("Error checking for posts:", error);
+        });
 
       // Delete profile information from Firebase Database
       const docRef = doc(FIREBASE_DB, "users", userId);

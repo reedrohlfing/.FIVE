@@ -88,7 +88,12 @@ const Login = ({ navigation }) => {
       if (!userDoc.exists()) {
         await setDoc(
           userDocRef,
-          { phoneNumber: user.phoneNumber, initialized: false },
+          {
+            phoneNumber: user.phoneNumber,
+            initialized: false,
+            userId: user.uid,
+            buds: [user.uid],
+          },
           { merge: true }
         );
         navigation.navigate("ProfileCreation");
@@ -109,7 +114,7 @@ const Login = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Bubs</Text>
+      <Text style={styles.title}>Buds</Text>
       <View id="recaptcha-container" />
       {!confirmResult ? (
         <View style={styles.phoneSubmitView}>

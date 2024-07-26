@@ -2,73 +2,102 @@ import {
   StyleSheet,
   Text,
   View,
-  Image,
+  ActivityIndicator,
   ScrollView,
-  Dimensions,
   SafeAreaView,
 } from "react-native";
 import { Post } from "../components/Post";
+import {
+  collection,
+  onSnapshot,
+  query,
+  orderBy,
+  limit,
+  where,
+} from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { FIREBASE_DB } from "../FirebaseConfig";
+import { useProfileData } from "../ProfileContext";
 
-// Create a feed from the images folder
-// Probably a good idea to make this asynchronous so images are loaded and populated in order
 const ImgFeed = () => {
+  const { defaultData, profileData, setProfileData, updateProfile } =
+    useProfileData();
+  const [feedList, setFeedList] = useState(null);
+  const postsColRef = collection(FIREBASE_DB, "posts");
+  const ordered = query(
+    postsColRef,
+    where("userId", "in", profileData.buds),
+    orderBy("datetime", "desc"),
+    limit(25)
+  );
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(ordered, (snapshot) => {
+      const postData = snapshot.docs.map((post) => post.data());
+      setFeedList(postData);
+    });
+    return unsubscribe;
+  }, [profileData.buds]);
+
   return (
     <View>
-      <Post
-        profileImage={require("../fake-cdn/images/dive.jpg")}
-        user={"Reed"}
-        source={require("../fake-cdn/images/francebeach.jpg")}
-        time={"3 min ago"}
-      ></Post>
-      <Post
-        profileImage={require("../fake-cdn/images/dive.jpg")}
-        user={"Reed"}
-        source={require("../fake-cdn/images/italyalley.jpg")}
-        time={"7 min ago"}
-      ></Post>
-      <Post
-        profileImage={require("../fake-cdn/images/dive.jpg")}
-        user={"Reed"}
-        source={require("../fake-cdn/images/oslexit.jpg")}
-        time={"10 min ago"}
-      ></Post>
-      <Post
-        profileImage={require("../fake-cdn/images/dive.jpg")}
-        user={"Reed"}
-        source={require("../fake-cdn/images/pinkpainting.jpg")}
-        time={"30 min ago"}
-      ></Post>
-      <Post
-        profileImage={require("../fake-cdn/images/dive.jpg")}
-        user={"Reed"}
-        source={require("../fake-cdn/images/redshow.jpg")}
-        time={"41 min ago"}
-      ></Post>
-      <Post
-        profileImage={require("../fake-cdn/images/dive.jpg")}
-        user={"Reed"}
-        source={require("../fake-cdn/images/skate.jpg")}
-        time={"2 hours ago"}
-      ></Post>
+      {feedList &&
+        feedList.map((post, index) => <Post key={index} post={post} />)}
     </View>
   );
 };
 
 const Feed = () => {
+  const [loadingImage, setLoadingImage] = useState(true);
+  const [postsAvail, setPostsAvail] = useState(false);
+  const { defaultData, profileData, setProfileData, updateProfile } =
+    useProfileData();
+
+  useEffect(() => {
+    const postsColRef = collection(FIREBASE_DB, "posts");
+    const ordered = query(
+      postsColRef,
+      where("userId", "in", profileData.buds),
+      orderBy("datetime", "desc"),
+      limit(25)
+    );
+
+    const unsubscribe = onSnapshot(ordered, (snapshot) => {
+      setPostsAvail(snapshot.size > 0);
+      setLoadingImage(false);
+    });
+
+    return unsubscribe;
+  }, [profileData.buds]);
+
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
-        vertical={true}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        <ImgFeed style={styles.feed} />
-      </ScrollView>
+      {loadingImage ? (
+        <ActivityIndicator
+          size="large"
+          color="#00FFFF"
+          style={{ textAlign: "center", alignContent: "center", flex: 1 }}
+        />
+      ) : (
+        <ScrollView
+          vertical={true}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          {postsAvail ? (
+            <ImgFeed style={styles.feed} />
+          ) : (
+            <Text
+              style={{ textAlign: "center", alignContent: "center", flex: 1 }}
+            >
+              No posts available :(
+            </Text>
+          )}
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 };
-
-const screenWidth = Dimensions.get("window").width - 26;
 
 const styles = StyleSheet.create({
   container: {

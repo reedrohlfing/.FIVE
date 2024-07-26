@@ -7,6 +7,7 @@ import { Login } from "./pages/Login";
 import { NavBar } from "./components/NavBar";
 import { Settings } from "./pages/Settings";
 import { PostModal } from "./pages/PostModal";
+import { Bud } from "./pages/Bud";
 import { ProfileCreation } from "./pages/ProfileCreation";
 import { NotFound } from "./pages/NotFound";
 
@@ -31,6 +32,11 @@ function InsideLayout() {
         component={PostModal}
         options={{ headerShown: false }}
       />
+      <InsideStack.Screen
+        name="Bud"
+        component={Bud}
+        options={{ headerShown: false }}
+      />
     </InsideStack.Navigator>
   );
 }
@@ -38,6 +44,7 @@ function InsideLayout() {
 function AppNavigator() {
   const { user, isProfileSetUp } = useProfileData();
 
+  //TODO: Fix PostModal navigation
   const linking = {
     config: {
       screens: {
@@ -56,6 +63,7 @@ function AppNavigator() {
             },
             Settings: "settings",
             PostModal: ":userId/:post",
+            Bud: ":userId",
           },
         },
         NotFound: "*",
@@ -111,5 +119,8 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    maxWidth: 500,
+    alignContent: "center",
+    marginHorizontal: "auto",
   },
 });

@@ -3,19 +3,59 @@ import {
   Text,
   View,
   Image,
-  ScrollView,
   Dimensions,
+  Pressable,
 } from "react-native";
+import { doc, getDoc } from "firebase/firestore";
+import { FIREBASE_AUTH, FIREBASE_DB } from "../FirebaseConfig";
+import { useEffect, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+import moment from "moment";
 
-const Post = ({ profileImage, user, source, time }) => {
+const Post = ({ post }) => {
+  // Can't use ProfileContext here because user is imported
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    const userId = post.userId;
+    const docRef = doc(FIREBASE_DB, "users", userId);
+    getDoc(docRef).then((docSnap) => {
+      setUser(docSnap.data());
+    });
+  }, [post]);
+  const postDate = moment(post.datetime, "YYYYMMDD_HHmmss").fromNow();
+
+  //TODO: Using Gesture Handling, add double-tap functionality
+  const navigation = useNavigation();
   return (
     <View style={styles.post}>
-      <Image style={styles.feedBubble} source={source}></Image>
-      <View style={styles.postTitle}>
-        <Image style={styles.profileImage} source={profileImage} />
-        <Text style={styles.profileName}>{user}</Text>
-        <Text>{time}</Text>
-      </View>
+      <Image style={styles.feedBubble} source={{ uri: post.postURL }}></Image>
+      {user && (
+        <View style={styles.postTitle}>
+          <Pressable
+            onPress={() =>
+              user.userId === FIREBASE_AUTH.currentUser.uid
+                ? navigation.navigate("Profile")
+                : navigation.navigate("Bud", { user: user })
+            }
+          >
+            <Image
+              style={styles.profileImage}
+              source={{ uri: user.profileImage }}
+            />
+          </Pressable>
+          <Pressable
+            onPress={() =>
+              user.userId === FIREBASE_AUTH.currentUser.uid
+                ? navigation.navigate("Profile")
+                : navigation.navigate("Bud", { user: user })
+            }
+          >
+            <Text style={styles.profileName}>{user.firstName}</Text>
+          </Pressable>
+
+          <Text>{postDate}</Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -28,7 +68,9 @@ const styles = StyleSheet.create({
   },
   feedBubble: {
     width: screenWidth,
+    maxWidth: 474,
     height: screenWidth,
+    maxHeight: 474,
     borderRadius: "50%",
     alignSelf: "center",
     backgroundColor: "#F6F6F6",
