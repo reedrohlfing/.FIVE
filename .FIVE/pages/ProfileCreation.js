@@ -151,7 +151,11 @@ const ProfileCreation = () => {
               <TextInput
                 style={[styles.input, styles.phoneNumber]}
                 onChangeText={(text) =>
-                  setProfileData((prev) => ({ ...prev, phoneNumber: text }))
+                  setProfileData((prev) => ({
+                    ...prev,
+                    phoneNumber: text,
+                    phoneNumberNoCountry: text.substring(2),
+                  }))
                 }
                 defaultValue={
                   FIREBASE_AUTH.currentUser
@@ -169,7 +173,13 @@ const ProfileCreation = () => {
                   invalidFields.location && styles.invalidInput,
                 ]}
                 onChangeText={(text) =>
-                  setProfileData((prev) => ({ ...prev, firstName: text }))
+                  setProfileData((prev) => ({
+                    ...prev,
+                    firstName: text,
+                    firstNameLower: text.toLowerCase(),
+                    fullNameLower:
+                      text.toLowerCase() + " " + profileData.lastNameLower,
+                  }))
                 }
                 placeholder="Add First Name"
               />
@@ -182,7 +192,13 @@ const ProfileCreation = () => {
                   invalidFields.location && styles.invalidInput,
                 ]}
                 onChangeText={(text) =>
-                  setProfileData((prev) => ({ ...prev, lastName: text }))
+                  setProfileData((prev) => ({
+                    ...prev,
+                    lastName: text,
+                    lastNameLower: text.toLowerCase(),
+                    fullNameLower:
+                      profileData.firstNameLower + " " + text.toLowerCase(),
+                  }))
                 }
                 placeholder="Add Last Name"
               />

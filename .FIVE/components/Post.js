@@ -35,7 +35,7 @@ const Post = ({ post }) => {
             onPress={() =>
               user.userId === FIREBASE_AUTH.currentUser.uid
                 ? navigation.navigate("Profile")
-                : navigation.navigate("Bud", { user: user })
+                : navigation.navigate("Bud", { userId: user.userId })
             }
           >
             <Image
@@ -47,7 +47,9 @@ const Post = ({ post }) => {
             onPress={() =>
               user.userId === FIREBASE_AUTH.currentUser.uid
                 ? navigation.navigate("Profile")
-                : navigation.navigate("Bud", { user: user })
+                : navigation.navigate("Bud", {
+                    userId: user.userId,
+                  })
             }
           >
             <Text style={styles.profileName}>{user.firstName}</Text>

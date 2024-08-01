@@ -15,7 +15,7 @@ const Profile = () => {
       >
         <Image
           style={styles.button}
-          source={require("../assets/icons/settings-black-inactive.png")}
+          source={require("../assets/icons/settings-inactive.png")}
         />
       </Pressable>
 
@@ -35,11 +35,18 @@ const styles = StyleSheet.create({
   settingsButton: {
     position: "absolute",
     right: 13,
-    top: 11.5,
+    //top: 9,
+    backgroundColor: "#F6F6F6",
+    borderRadius: "50%",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 56,
+    height: 56,
+    margin: 1,
   },
   button: {
-    width: 33,
-    height: 33,
+    width: 34,
+    height: 34,
   },
 });
 

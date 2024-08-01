@@ -6,39 +6,41 @@ import {
   SafeAreaView,
   Pressable,
   Dimensions,
+  Text,
 } from "react-native";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   collection,
   onSnapshot,
   query,
-  orderBy,
+  and,
   limit,
   where,
 } from "firebase/firestore";
 import { FIREBASE_DB } from "../FirebaseConfig";
+import { useProfileData } from "../ProfileContext";
 
-const GridImageCircles = ({ navigation, userId }) => {
+const UserGrid = ({ navigation }) => {
+  const { defaultData, profileData, setProfileData, updateProfile } =
+    useProfileData();
   const [circles, setCircles] = useState([]);
 
-  const postsColRef = collection(FIREBASE_DB, "posts");
-  const ordered = query(
+  const postsColRef = collection(FIREBASE_DB, "users");
+  const buds = query(
     postsColRef,
-    where("userId", "==", userId),
-    orderBy("datetime", "desc"),
+    and(
+      where("userId", "in", profileData.buds),
+      where("userId", "!=", profileData.userId)
+    ),
     limit(24)
   );
+  onSnapshot(buds, (snapshot) => {
+    const budData = snapshot.docs.map((bud) => bud.data());
+    setCircles(budData);
+  });
 
-  useEffect(() => {
-    const unsubscribe = onSnapshot(ordered, (snapshot) => {
-      const postData = snapshot.docs.map((post) => post.data());
-      setCircles(postData);
-    });
-    return unsubscribe;
-  }, []);
-
-  const handleBubblePress = (post) => {
-    navigation.navigate("PostModal", { userId, post: post.datetime });
+  const handleBubblePress = (user) => {
+    navigation.navigate("Bud", { userId: user.userId });
   };
 
   const size = Dimensions.get("window").width / 2.4;
@@ -57,7 +59,7 @@ const GridImageCircles = ({ navigation, userId }) => {
             onPress={() => handleBubblePress(circle)}
           >
             <Image
-              source={{ uri: circle.postURL }}
+              source={{ uri: circle.profileImage }}
               style={{
                 width: size,
                 maxWidth: 198,
@@ -67,6 +69,7 @@ const GridImageCircles = ({ navigation, userId }) => {
                 backgroundColor: "#F6F6F6",
               }}
             />
+            <Text style={styles.nameText}>{circle.firstName}</Text>
           </Pressable>
         ))}
       </View>
@@ -79,7 +82,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   bubblesContainer: {
-    paddingVertical: 4,
+    paddingBottom: 10,
   },
   gridContainer: {
     display: "flex",
@@ -91,7 +94,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 12,
+    display: "flex",
+    flexDirection: "column",
+  },
+  nameText: {
+    fontWeight: "bold",
+    paddingTop: 4,
   },
 });
 
-export { GridImageCircles };
+export { UserGrid };

@@ -15,8 +15,11 @@ export const useProfileData = () => useContext(ProfileContext);
 
 const defaultData = {
   phoneNumber: "",
+  phoneNumberNoCountry: "",
   firstName: "Name",
+  firstNameLower: "",
   lastName: "",
+  lastNameLower: "",
   title: "Title",
   location: "Location",
   age: "Age",
@@ -28,6 +31,7 @@ const defaultData = {
   initialized: false,
   profileImage: require("./assets/icons/add-black-active.png"),
   buds: [],
+  bursts: [],
 };
 
 const fetchProfileData = async (userId, setProfileData) => {

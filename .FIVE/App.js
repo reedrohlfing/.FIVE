@@ -25,17 +25,25 @@ function InsideLayout() {
       <InsideStack.Screen
         name="Settings"
         component={Settings}
-        options={{ title: "Profile Settings" }}
+        options={{ headerShown: false }}
       />
       <InsideStack.Screen
         name="PostModal"
         component={PostModal}
-        options={{ headerShown: false }}
+        options={({ route }) => ({
+          headerShown: false,
+          presentation: "modal",
+          userId: route.params.userId,
+          post: route.params.post,
+        })}
       />
       <InsideStack.Screen
         name="Bud"
         component={Bud}
-        options={{ headerShown: false }}
+        options={({ route }) => ({
+          headerShown: false,
+          userId: route.params.userId,
+        })}
       />
     </InsideStack.Navigator>
   );

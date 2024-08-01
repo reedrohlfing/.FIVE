@@ -5,20 +5,55 @@ import {
   Image,
   ScrollView,
   SafeAreaView,
+  ActivityIndicator,
   Pressable,
   Linking,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { GridImageCircles } from "../components/GridImageCircles";
 import { AddBud } from "../components/AddBud";
+import { BackButton } from "../components/BackButton";
+import { BurstButton } from "../components/BurstButton";
+import { doc, getDoc } from "firebase/firestore";
+import { FIREBASE_DB } from "../FirebaseConfig";
+import { useEffect, useState } from "react";
+
+// TODO: On refresh, the top bar changes to a grey instead of white
 
 const Bud = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { user } = route.params;
-  let profileData = user;
+  const { userId } = route.params;
+  const [profileData, setProfileData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  return (
+  useEffect(() => {
+    const docRef = doc(FIREBASE_DB, "users", userId);
+    getDoc(docRef).then((docSnap) => {
+      if (docSnap.exists()) {
+        setProfileData(docSnap.data());
+      } else {
+        console.log(
+          "Error: Could not load user profile information based off this userId: ",
+          userId
+        );
+      }
+      setLoading(false);
+    });
+  }, [userId]);
+
+  return loading ? (
+    <View
+      style={{
+        flex: 1,
+        alignContent: "center",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <ActivityIndicator size="large" color="#00FFFF" />
+    </View>
+  ) : (
     <SafeAreaView style={[styles.container, StyleSheet.absoluteFill]}>
       <View>
         <View style={styles.profileHeader}>
@@ -32,7 +67,7 @@ const Bud = () => {
             </Text>
             <Text style={styles.location}>{profileData.location}</Text>
           </View>
-          <AddBud userId={user.userId} buttonStyle={styles.button} />
+          <AddBud userId={userId} buttonStyle={styles.addButton} />
         </View>
 
         <ScrollView
@@ -62,7 +97,9 @@ const Bud = () => {
           )}
         </ScrollView>
       </View>
-      <GridImageCircles navigation={navigation} userId={user.userId} />
+      <GridImageCircles navigation={navigation} userId={userId} />
+      <BackButton navigation={navigation} />
+      <BurstButton budId={userId} />
     </SafeAreaView>
   );
 };
@@ -72,10 +109,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-  button: {
+  addButton: {
     width: 56,
     height: 56,
-    margin: 1,
   },
   profileHeader: {
     display: "flex",
@@ -93,6 +129,7 @@ const styles = StyleSheet.create({
   nameLocation: {
     paddingHorizontal: 20,
     flex: 1,
+    alignSelf: "center",
   },
   name: {
     fontSize: 20,

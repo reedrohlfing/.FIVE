@@ -1,15 +1,5 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  Dimensions,
-  Pressable,
-} from "react-native";
-import { doc, getDoc } from "firebase/firestore";
-import { FIREBASE_AUTH, FIREBASE_DB } from "../FirebaseConfig";
+import { StyleSheet, Image, Pressable } from "react-native";
 import { useEffect, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
 import { useProfileData } from "../ProfileContext";
 
 const AddBud = ({ userId, buttonStyle }) => {

@@ -90,6 +90,7 @@ const Login = ({ navigation }) => {
           userDocRef,
           {
             phoneNumber: user.phoneNumber,
+            phoneNumberNoCountry: user.phoneNumber.substring(2),
             initialized: false,
             userId: user.uid,
             buds: [user.uid],

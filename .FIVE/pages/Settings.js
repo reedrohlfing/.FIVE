@@ -25,8 +25,11 @@ import BirthdayPicker from "../components/BirthdayPicker";
 import { useProfileData } from "../ProfileContext";
 import ProfileHeader from "../components/ProfileHeader";
 import { useState } from "react";
+import { BackButton } from "../components/BackButton";
+import { useNavigation } from "@react-navigation/native";
 
 const Settings = () => {
+  const navigation = useNavigation();
   const { defaultData, profileData, setProfileData, updateProfile } =
     useProfileData();
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
@@ -133,7 +136,14 @@ const Settings = () => {
           <Text style={styles.descriptor}>First Name</Text>
           <TextInput
             style={styles.input}
-            onChangeText={(text) => updateProfile({ firstName: text })}
+            onChangeText={(text) =>
+              updateProfile({
+                firstName: text,
+                firstNameLower: text.toLowerCase(),
+                fullNameLower:
+                  text.toLowerCase() + " " + profileData.lastNameLower,
+              })
+            }
             value={profileData.firstName}
           />
         </View>
@@ -141,7 +151,14 @@ const Settings = () => {
           <Text style={styles.descriptor}>Last Name</Text>
           <TextInput
             style={styles.input}
-            onChangeText={(text) => updateProfile({ lastName: text })}
+            onChangeText={(text) =>
+              updateProfile({
+                lastName: text,
+                lastNameLower: text.toLowerCase(),
+                fullNameLower:
+                  profileData.firstNameLower + " " + text.toLowerCase(),
+              })
+            }
             value={profileData.lastName}
           />
         </View>
@@ -245,6 +262,7 @@ const Settings = () => {
           </View>
         )}
       </ScrollView>
+      <BackButton navigation={navigation} />
     </SafeAreaView>
   );
 };
@@ -253,7 +271,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingTop: 10,
+    //paddingTop: 10,
   },
   descriptorsContainer: {
     flex: 1,
