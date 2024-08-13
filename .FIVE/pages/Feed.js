@@ -20,6 +20,7 @@ import { FIREBASE_DB } from "../FirebaseConfig";
 import { useProfileData } from "../ProfileContext";
 
 const ImgFeed = () => {
+  // Function to create a list of Image posts
   const { defaultData, profileData, setProfileData, updateProfile } =
     useProfileData();
   const [feedList, setFeedList] = useState(null);
@@ -53,6 +54,7 @@ const Feed = () => {
   const { defaultData, profileData, setProfileData, updateProfile } =
     useProfileData();
 
+  // Check to see if posts are available for display, otherwise show "No Posts Available :("
   useEffect(() => {
     const postsColRef = collection(FIREBASE_DB, "posts");
     const ordered = query(

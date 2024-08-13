@@ -52,12 +52,31 @@ export default function ProfileHeader() {
           },
         },
       })
-        .then(async (snapshot) => {
-          const downloadURL = await getDownloadURL(snapshot.ref);
-          await updateProfile({ profileImage: downloadURL });
+        .then(() => {
+          // Update the profile header image with the compressed version
+          updateProfile({ profileImageRef: storageRef });
         })
         .then(() => {
-          setLoadingImage(false);
+          // Wait for 2 seconds for compressed versions to be made
+          return new Promise((resolve) => {
+            setTimeout(resolve, 2000);
+          });
+        })
+        .then(() => {
+          // Make reference to large image URL
+          const imgRef = ref(FIREBASE_STORAGE, storageRef + "_720x720");
+          getDownloadURL(imgRef).then(async (url) => {
+            await updateProfile({ profileImageLarge: url });
+            setLoadingImage(false);
+          });
+        })
+        .then(() => {
+          // Make reference to thumbnail size image URL
+          const imgRef = ref(FIREBASE_STORAGE, storageRef + "_150x150");
+          getDownloadURL(imgRef).then(async (url) => {
+            await updateProfile({ profileImage: url });
+            setLoadingImage(false);
+          });
         })
         .catch((error) => {
           console.error("Error uploading image: ", error);
@@ -67,7 +86,7 @@ export default function ProfileHeader() {
   };
 
   return (
-    <div>
+    <View>
       <View style={styles.profileHeader}>
         <View style={{ flexDirection: "row", justifyContent: "flex-start" }}>
           <Pressable onPress={handleImagePicker}>
@@ -92,7 +111,6 @@ export default function ProfileHeader() {
           </View>
         </View>
       </View>
-
       <ScrollView
         horizontal={true}
         showsHorizontalScrollIndicator={false}
@@ -119,7 +137,7 @@ export default function ProfileHeader() {
           </Pressable>
         )}
       </ScrollView>
-    </div>
+    </View>
   );
 }
 

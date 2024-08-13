@@ -1,12 +1,25 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { StyleSheet, Image, Pressable } from "react-native";
 import { useProfileData } from "../ProfileContext";
 import moment from "moment";
+import { FIREBASE_FUNCS } from "../FirebaseConfig";
+import { httpsCallable } from "firebase/functions";
 
 const BurstButton = ({ budId }) => {
   const [pressed, setPressed] = useState(false);
   const { defaultData, profileData, setProfileData, updateProfile } =
     useProfileData();
+  const sendBurstNotification = httpsCallable(
+    FIREBASE_FUNCS,
+    "sendBurstNotification"
+  );
+
+  useEffect(() => {
+    // Check if user has already been bursted
+    if (profileData.iBursted.includes(budId)) {
+      setPressed(true);
+    }
+  }, [profileData, budId]);
 
   const handleBurst = () => {
     setPressed(true);
@@ -18,17 +31,25 @@ const BurstButton = ({ budId }) => {
       });
     }
 
-    // Only send one notification that the user got bursted
-    // const dateNow = moment().format("YYYYMMDD_HHmmss");
-    // updateProfile({
-    //     bursts: [...profileData.bursts, {
-    //         datetime: dateNow,
-    //         burstType: 'bud_profile'
-    //         user:
-    //     }
-    //     ]
-    // })
+    // Only send a notification if bud hasn't already been bursted
+    if (!profileData.iBursted.includes(budId)) {
+      // Add burst notification to my burst list
+      updateProfile({
+        iBursted: [...profileData.iBursted, budId],
+      });
+      // Create a new burst notification
+      const burstNotification = {
+        senderId: profileData.userId,
+        receiverId: budId,
+        timestamp: moment().format("YYYYMMDD_HHmmss"),
+      };
+      // Send the burst notification to the other user
+      sendBurstNotification(burstNotification).catch((error) => {
+        console.log("Error: ", error);
+      });
+    }
   };
+
   return (
     <Pressable style={styles.backButton} onPress={() => handleBurst()}>
       <Image

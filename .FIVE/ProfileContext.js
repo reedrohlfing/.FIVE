@@ -30,8 +30,10 @@ const defaultData = {
   linkURL: "",
   initialized: false,
   profileImage: require("./assets/icons/add-black-active.png"),
+  profileImageLarge: require("./assets/icons/add-black-active.png"),
+  profileImageRef: "",
   buds: [],
-  bursts: [],
+  iBursted: [],
 };
 
 const fetchProfileData = async (userId, setProfileData) => {
@@ -39,7 +41,7 @@ const fetchProfileData = async (userId, setProfileData) => {
     const docRef = doc(FIREBASE_DB, "users", userId);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-      setProfileData(...defaultData, docSnap.data());
+      setProfileData({ ...defaultData, ...docSnap.data() });
     } else {
       console.log(
         "ERROR: Couldn't find user document from FireStore database. User is likely not initialized"

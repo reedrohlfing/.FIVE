@@ -18,7 +18,6 @@ const Profile = () => {
           source={require("../assets/icons/settings-inactive.png")}
         />
       </Pressable>
-
       <GridImageCircles
         navigation={navigation}
         userId={FIREBASE_AUTH.currentUser.uid}

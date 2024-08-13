@@ -59,7 +59,7 @@ const UserGrid = ({ navigation }) => {
             onPress={() => handleBubblePress(circle)}
           >
             <Image
-              source={{ uri: circle.profileImage }}
+              source={{ uri: circle.profileImageLarge }}
               style={{
                 width: size,
                 maxWidth: 198,

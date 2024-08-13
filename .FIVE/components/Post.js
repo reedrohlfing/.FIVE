@@ -16,12 +16,15 @@ const Post = ({ post }) => {
   // Can't use ProfileContext here because user is imported
   const [user, setUser] = useState(null);
   useEffect(() => {
+    // Grab profile information based on userId to display first + last name
     const userId = post.userId;
     const docRef = doc(FIREBASE_DB, "users", userId);
     getDoc(docRef).then((docSnap) => {
       setUser(docSnap.data());
     });
   }, [post]);
+
+  // convert the time of the post to a text description
   const postDate = moment(post.datetime, "YYYYMMDD_HHmmss").fromNow();
 
   //TODO: Using Gesture Handling, add double-tap functionality

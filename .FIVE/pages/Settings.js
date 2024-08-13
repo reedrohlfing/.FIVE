@@ -49,7 +49,7 @@ const Settings = () => {
       // Delete photos from Firebase Storage
       const profileImageRef = ref(
         FIREBASE_STORAGE,
-        `user/${userId}/profileImage`
+        `user/${userId}/profileImage_720x720`
       );
       getDownloadURL(profileImageRef)
         .then(() => {
@@ -115,7 +115,6 @@ const Settings = () => {
   return (
     <SafeAreaView style={[styles.container, StyleSheet.absoluteFill]}>
       <ProfileHeader />
-
       <ScrollView
         vertical={true}
         showsVerticalScrollIndicator={false}

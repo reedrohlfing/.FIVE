@@ -94,17 +94,24 @@ const Capture = () => {
     deleteObject(postRef);
   };
 
-  const handlePost = () => {
+  const handlePost = async () => {
     // TODO: Create some animation for when a user posts photo
     setPostLoaded(false);
 
     // Add post to post pool
     const userID = FIREBASE_AUTH.currentUser.uid;
+    const postDir =
+      "user/" + userID + "/posts/" + profileData.tempUploadTitle + "_720x720";
+    const postRef = ref(FIREBASE_STORAGE, postDir);
+    const postURL = await getDownloadURL(postRef);
     const postData = {
       userId: userID,
-      postURL: profileData.tempUploadURL,
+      postURL: postURL,
+      postDir: postDir,
       datetime: profileData.tempUploadTitle,
     };
+
+    // Create post reference in database
     let docName = userID + "_" + profileData.tempUploadTitle;
     let postPoolRef = doc(FIREBASE_DB, "posts", docName);
     setDoc(postPoolRef, postData);
