@@ -52,18 +52,11 @@ const Bud = () => {
   }, [userId]);
 
   return loading ? (
-    <View
-      style={{
-        flex: 1,
-        alignContent: "center",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
+    <View style={styles.loadingContainer}>
       <ActivityIndicator size="large" color="#00FFFF" />
     </View>
   ) : (
-    <SafeAreaView style={[styles.container, StyleSheet.absoluteFill]}>
+    <View style={[styles.container, StyleSheet.absoluteFill]}>
       <View>
         <View style={styles.profileHeader}>
           <Image style={styles.profileImage} source={userData.profileImage} />
@@ -106,13 +99,20 @@ const Bud = () => {
       <GridImageCircles navigation={navigation} userId={userId} />
       <BackButton navigation={navigation} />
       <BurstButton budId={userId} />
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#fff",
+  },
+  loadingContainer: {
+    flex: 1,
+    alignContent: "center",
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: "#fff",
   },
   addButton: {

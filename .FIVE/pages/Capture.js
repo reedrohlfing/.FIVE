@@ -89,9 +89,32 @@ const Capture = () => {
 
   const handleCancelPost = () => {
     setPostLoaded(false);
+    const userID = FIREBASE_AUTH.currentUser.uid;
+
     // Remove the post from Storage
-    const postRef = ref(FIREBASE_STORAGE, profileData.tempUploadTitle);
-    deleteObject(postRef);
+    const postRef = ref(
+      FIREBASE_STORAGE,
+      "user/" + userID + "/posts/" + profileData.tempUploadTitle
+    );
+    if (postRef) {
+      deleteObject(postRef);
+    }
+
+    // Remove the compressed versions as well
+    const postRef150 = ref(
+      FIREBASE_STORAGE,
+      "user/" + userID + "/posts/" + profileData.tempUploadTitle + "_150x150"
+    );
+    if (postRef150) {
+      deleteObject(postRef150);
+    }
+    const postRef720 = ref(
+      FIREBASE_STORAGE,
+      "user/" + userID + "/posts/" + profileData.tempUploadTitle + "_720x720"
+    );
+    if (postRef720) {
+      deleteObject(postRef720);
+    }
   };
 
   const handlePost = async () => {
@@ -124,7 +147,7 @@ const Capture = () => {
     <SafeAreaView style={styles.container}>
       {loadingImage ? (
         <ActivityIndicator
-          style={styles.uploadButton}
+          style={[styles.uploadButton, styles.loading]}
           size="large"
           color="white"
         />
@@ -153,17 +176,25 @@ const Capture = () => {
               ]}
               onPress={handleImagePicker}
               pressed={pressed}
-              onPressIn={() => setPressed(true)}
-              onPressOut={() => setPressed(false)}
+              onTouchStart={() => setPressed(true)}
+              onTouchEnd={() => setPressed(false)}
+              on
             >
-              <Text
+              <View style={[styles.innerCircle]}></View>
+              <View
                 style={[
-                  styles.uploadButtonText,
-                  pressed && styles.uploadButtonTextPressed,
+                  styles.uploadButtonPlus,
+                  styles.plusHorizontal,
+                  pressed && styles.uploadButtonPlusPressed,
                 ]}
-              >
-                Capture Bubble
-              </Text>
+              ></View>
+              <View
+                style={[
+                  styles.uploadButtonPlus,
+                  styles.plusVertical,
+                  pressed && styles.uploadButtonPlusPressed,
+                ]}
+              ></View>
             </Pressable>
           )}
         </View>
@@ -172,41 +203,69 @@ const Capture = () => {
   );
 };
 
-const screenWidth = Dimensions.get("window").width - 26;
+const screenWidth = Dimensions.get("window").width;
+const outerCircleDiameter = screenWidth - 26;
+const innerCircleDiameter = screenWidth - 40;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+    paddingTop: 1,
   },
   uploadButton: {
     borderRadius: "50%",
+    border: "4px solid black",
     alignSelf: "center",
     justifyContent: "center",
-    height: screenWidth,
+    height: outerCircleDiameter,
     maxHeight: 474,
-    width: screenWidth,
+    width: outerCircleDiameter,
     maxWidth: 474,
+    backgroundColor: "#F6F6F6",
+  },
+  loading: {
+    border: "none",
     backgroundColor: "#00FFFF",
+  },
+  innerCircle: {
+    borderRadius: "50%",
+    border: "4px dashed black",
+    alignSelf: "center",
+    justifyContent: "center",
+    height: innerCircleDiameter,
+    maxHeight: 474,
+    width: innerCircleDiameter,
+    maxWidth: 474,
+    backgroundColor: "transparent",
   },
   uploadButtonPressed: {
     backgroundColor: "black",
   },
-  uploadButtonText: {
+  uploadButtonPlus: {
     textAlign: "center",
-    fontWeight: "bold",
-    fontSize: 30,
-    color: "black",
+    alignSelf: "center",
+    backgroundColor: "black",
+    borderRadius: 4,
+    position: "absolute",
   },
-  uploadButtonTextPressed: {
-    color: "white",
+  uploadButtonPlusPressed: {
+    backgroundColor: "white",
+  },
+  plusHorizontal: {
+    height: 4,
+    width: outerCircleDiameter * 0.4,
+  },
+  plusVertical: {
+    height: outerCircleDiameter * 0.4,
+    width: 4,
   },
   post: {
     borderRadius: "50%",
     alignSelf: "center",
     justifyContent: "center",
-    height: screenWidth,
+    height: outerCircleDiameter,
     maxHeight: 474,
-    width: screenWidth,
+    width: outerCircleDiameter,
     maxWidth: 474,
   },
   twoButtons: {

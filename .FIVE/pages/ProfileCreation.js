@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { doc, deleteDoc } from "firebase/firestore";
-import { ref, deleteObject } from "firebase/storage";
+import { ref, listAll, deleteObject } from "firebase/storage";
 import {
   FIREBASE_AUTH,
   FIREBASE_DB,
@@ -122,7 +122,16 @@ const ProfileCreation = () => {
       `user/${userId}/profileImage`
     );
     if (profileImageRef) {
-      deleteObject(profileImageRef);
+      // Delete all profile images for user
+      const profileImgsRef = ref(FIREBASE_STORAGE, `user/${userId}`);
+      const profileImgs = await listAll(profileImgsRef);
+      const profileRefs = profileImgs.items;
+
+      Promise.all(profileRefs.map((imageRef) => deleteObject(imageRef))).catch(
+        (error) => {
+          console.error("Error deleting profile images:", error);
+        }
+      );
     }
 
     // Log out of app

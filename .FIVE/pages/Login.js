@@ -115,7 +115,7 @@ const Login = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Buds</Text>
+      <Text style={styles.title}>.FIVE</Text>
       <View id="recaptcha-container" />
       {!confirmResult ? (
         <View style={styles.phoneSubmitView}>
@@ -133,12 +133,12 @@ const Login = ({ navigation }) => {
               />
               <Pressable
                 style={({ pressed }) => [
-                  styles.submitButton,
+                  styles.nextButton,
                   pressed && { backgroundColor: "rgba(0, 155, 155, 1)" },
                 ]}
                 onPress={sendCode}
               >
-                <Text style={styles.submitButtonText}>Next</Text>
+                <Text style={styles.nextButtonText}>Next</Text>
               </Pressable>
             </View>
           )}
@@ -158,12 +158,12 @@ const Login = ({ navigation }) => {
               />
               <Pressable
                 style={({ pressed }) => [
-                  styles.submitButton,
+                  styles.goButton,
                   pressed && { backgroundColor: "rgba(0, 155, 155, 1)" },
                 ]}
                 onPress={confirmCode}
               >
-                <Text style={styles.submitButtonText}>Go</Text>
+                <Text style={styles.goButtonText}>Go</Text>
               </Pressable>
             </View>
           )}
@@ -178,14 +178,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     padding: 16,
-    backgroundColor: "#4200FF",
+    backgroundColor: "#fff",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 16,
     textAlign: "center",
-    color: "white",
+    color: "black",
   },
   phoneSubmitView: {
     width: "85%",
@@ -195,7 +195,15 @@ const styles = StyleSheet.create({
     width: "85%",
     alignSelf: "center",
   },
-  submitButton: {
+  nextButton: {
+    backgroundColor: "#4200FF",
+    height: 40,
+    borderRadius: 20,
+    marginTop: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  goButton: {
     backgroundColor: "#00FFFF",
     height: 40,
     borderRadius: 20,
@@ -203,9 +211,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  submitButtonText: {
+  nextButtonText: {
+    color: "white",
+    textAlign: "center",
+    fontWeight: "bold",
+  },
+  goButtonText: {
     color: "black",
     textAlign: "center",
+    fontWeight: "bold",
   },
 });
 

@@ -130,5 +130,6 @@ const styles = StyleSheet.create({
     maxWidth: 500,
     alignContent: "center",
     marginHorizontal: "auto",
+    backgroundColor: "#fff",
   },
 });

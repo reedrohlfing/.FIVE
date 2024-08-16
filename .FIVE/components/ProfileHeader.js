@@ -40,7 +40,8 @@ export default function ProfileHeader() {
       setLoadingImage(true);
       const imageUri = result.assets[0].uri;
       const userID = getAuth().currentUser.uid;
-      const storageRef = ref(FIREBASE_STORAGE, `user/${userID}/profileImage`);
+      const profImgFilename = `user/${userID}/profileImage`;
+      const storageRef = ref(FIREBASE_STORAGE, profImgFilename);
 
       const response = await fetch(imageUri);
       const blob = await response.blob();
@@ -54,17 +55,17 @@ export default function ProfileHeader() {
       })
         .then(() => {
           // Update the profile header image with the compressed version
-          updateProfile({ profileImageRef: storageRef });
+          updateProfile({ profileImageRef: profImgFilename });
         })
         .then(() => {
-          // Wait for 2 seconds for compressed versions to be made
+          // Wait for 3 seconds for compressed versions to be made
           return new Promise((resolve) => {
-            setTimeout(resolve, 2000);
+            setTimeout(resolve, 3000);
           });
         })
         .then(() => {
           // Make reference to large image URL
-          const imgRef = ref(FIREBASE_STORAGE, storageRef + "_720x720");
+          const imgRef = ref(FIREBASE_STORAGE, profImgFilename + "_720x720");
           getDownloadURL(imgRef).then(async (url) => {
             await updateProfile({ profileImageLarge: url });
             setLoadingImage(false);
@@ -72,7 +73,7 @@ export default function ProfileHeader() {
         })
         .then(() => {
           // Make reference to thumbnail size image URL
-          const imgRef = ref(FIREBASE_STORAGE, storageRef + "_150x150");
+          const imgRef = ref(FIREBASE_STORAGE, profImgFilename + "_150x150");
           getDownloadURL(imgRef).then(async (url) => {
             await updateProfile({ profileImage: url });
             setLoadingImage(false);

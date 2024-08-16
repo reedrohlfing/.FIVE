@@ -11,6 +11,7 @@ import {
   FIREBASE_AUTH,
   FIREBASE_STORAGE,
   FIREBASE_DB,
+  FIREBASE_FUNCS,
 } from "../FirebaseConfig";
 import { ref, deleteObject, listAll, getDownloadURL } from "firebase/storage";
 import {
@@ -27,6 +28,7 @@ import ProfileHeader from "../components/ProfileHeader";
 import { useState } from "react";
 import { BackButton } from "../components/BackButton";
 import { useNavigation } from "@react-navigation/native";
+import { httpsCallable } from "firebase/functions";
 
 const Settings = () => {
   const navigation = useNavigation();
@@ -46,23 +48,18 @@ const Settings = () => {
     try {
       const userId = profileData.userId;
 
-      // Delete photos from Firebase Storage
-      const profileImageRef = ref(
-        FIREBASE_STORAGE,
-        `user/${userId}/profileImage_720x720`
+      // Delete all profile images for user
+      const profileImgRef = ref(FIREBASE_STORAGE, `user/${userId}`);
+      const profileImgs = await listAll(profileImgRef);
+      const profileRefs = profileImgs.items;
+
+      Promise.all(profileRefs.map((imageRef) => deleteObject(imageRef))).catch(
+        (error) => {
+          console.error("Error deleting profile images:", error);
+        }
       );
-      getDownloadURL(profileImageRef)
-        .then(() => {
-          // File exists, delete it
-          deleteObject(profileImageRef);
-        })
-        .catch((error) => {
-          // File doesn't exist, handle the error or do nothing
-          if (error.code === "storage/object-not-found") {
-            // File doesn't exist, do nothing
-            console.log("No profile image when deleting account.");
-          }
-        });
+
+      // Delete all posts for user
       const postsImgRef = ref(FIREBASE_STORAGE, `user/${userId}/posts`);
       const posts = await listAll(postsImgRef);
       const imageRefs = posts.items;
@@ -96,12 +93,25 @@ const Settings = () => {
           console.error("Error checking for posts:", error);
         });
 
+      // Delete the bursts collection if it exists
+      const burstsRef = collection(FIREBASE_DB, "users", userId, "bursts");
+      if (burstsRef) {
+        var deleteFn = httpsCallable(FIREBASE_FUNCS, "recursiveDelete");
+        deleteFn({ path: "users/" + userId + "/bursts" })
+          .then(function (result) {
+            console.log("Delete success: " + JSON.stringify(result));
+          })
+          .catch(function (err) {
+            console.log("Delete failed, see console,");
+            console.warn(err);
+          });
+      } else {
+        console.log("User bursts collection does not exist or is empty");
+      }
+
       // Delete profile information from Firebase Database
       const docRef = doc(FIREBASE_DB, "users", userId);
       await deleteDoc(docRef);
-
-      // Delete user account
-      // await user.delete();
 
       // Sign Out
       await FIREBASE_AUTH.signOut();
