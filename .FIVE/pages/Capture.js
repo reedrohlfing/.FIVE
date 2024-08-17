@@ -203,6 +203,7 @@ const Capture = () => {
   );
 };
 
+// TODO: Need to fix this for larger screen sizes, can't use window width for plus icon
 const screenWidth = Dimensions.get("window").width;
 const outerCircleDiameter = screenWidth - 26;
 const innerCircleDiameter = screenWidth - 40;

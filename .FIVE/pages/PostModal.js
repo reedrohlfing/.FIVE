@@ -5,6 +5,7 @@ import { BackButton } from "../components/BackButton";
 import { useState, useEffect } from "react";
 import { FIREBASE_DB } from "../FirebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
+import { DeletePostButton } from "../components/DeletePostButton";
 
 // TODO: Create commenting functionality, so users can comment on buds pictures, but their only viewable by the user their commenting on
 //       This also allows users to see what posts theyve already interacted with
@@ -42,6 +43,7 @@ const PostModal = ({ route }) => {
         <Post post={postData} />
       </Pressable>
       <BackButton navigation={navigation} />
+      <DeletePostButton userId={userId} postId={post_datetime} />
     </Pressable>
   );
 };

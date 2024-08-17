@@ -29,11 +29,15 @@ import { useState } from "react";
 import { BackButton } from "../components/BackButton";
 import { useNavigation } from "@react-navigation/native";
 import { httpsCallable } from "firebase/functions";
+import { ShareButton } from "../components/ShareButton";
 
 const Settings = () => {
   const navigation = useNavigation();
   const { defaultData, profileData, setProfileData, updateProfile } =
     useProfileData();
+  const userId = profileData.userId;
+  const shareLink = `https://dotfive-df9ca.web.app/${userId}`;
+  const shareTitle = profileData.firstName + " " + profileData.lastName;
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
   const confirmDeleteAccount = () => {
@@ -46,8 +50,6 @@ const Settings = () => {
 
   const deleteAccount = async () => {
     try {
-      const userId = profileData.userId;
-
       // Delete all profile images for user
       const profileImgRef = ref(FIREBASE_STORAGE, `user/${userId}`);
       const profileImgs = await listAll(profileImgRef);
@@ -121,10 +123,10 @@ const Settings = () => {
       console.error("Error deleting account:", error);
     }
   };
-
   return (
     <SafeAreaView style={[styles.container, StyleSheet.absoluteFill]}>
       <ProfileHeader />
+      <ShareButton shareLink={shareLink} shareTitle={shareTitle} />
       <ScrollView
         vertical={true}
         showsVerticalScrollIndicator={false}
