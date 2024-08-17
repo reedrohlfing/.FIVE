@@ -41,7 +41,7 @@ const BurstButton = ({ budId }) => {
       const burstNotification = {
         senderId: profileData.userId,
         receiverId: budId,
-        timestamp: moment().format("YYYYMMDD_HHmmss"),
+        timestamp: moment.utc().format("YYYYMMDD_HHmmss"),
       };
       // Send the burst notification to the other user
       sendBurstNotification(burstNotification).catch((error) => {

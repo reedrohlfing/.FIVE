@@ -55,7 +55,7 @@ const Capture = () => {
       setLoadingImage(true);
       const imageUri = result.assets[0].uri;
       const userID = FIREBASE_AUTH.currentUser.uid;
-      const dateNow = moment().format("YYYYMMDD_HHmmss");
+      const dateNow = moment.utc().format("YYYYMMDD_HHmmss");
       const uploadFilename = `user/${userID}/posts/${dateNow}`;
       const postRef = ref(FIREBASE_STORAGE, uploadFilename);
 

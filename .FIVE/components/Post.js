@@ -25,7 +25,10 @@ const Post = ({ post }) => {
   }, [post]);
 
   // convert the time of the post to a text description
-  const postDate = moment(post.datetime, "YYYYMMDD_HHmmss").fromNow();
+  const postDate = moment
+    .utc(post.datetime, "YYYYMMDD_HHmmss")
+    .local()
+    .fromNow();
 
   //TODO: Using Gesture Handling, add double-tap functionality
   const navigation = useNavigation();

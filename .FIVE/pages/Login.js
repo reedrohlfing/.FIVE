@@ -148,7 +148,10 @@ const Login = ({ navigation }) => {
           {loading ? (
             <ActivityIndicator size="large" color="#00FFFF" />
           ) : (
-            <View>
+            <View style={styles.authCodeGo}>
+              <Text style={styles.codeText}>
+                Please enter the 6-digit code texted to you.
+              </Text>
               <AuthCode
                 allowedCharacters="numeric"
                 onChange={setVerificationCode}
@@ -194,6 +197,13 @@ const styles = StyleSheet.create({
   codeSubmitView: {
     width: "85%",
     alignSelf: "center",
+  },
+  authCodeGo: {
+    width: "100%",
+  },
+  codeText: {
+    textAlign: "center",
+    paddingBottom: 20,
   },
   nextButton: {
     backgroundColor: "#4200FF",
