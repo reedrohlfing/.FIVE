@@ -25,6 +25,7 @@
     "expo": "~51.0.2",
     "expo-dev-client": "~4.0.14",
     "expo-image-picker": "^15.0.7",
+    "expo-sharing": "~12.0.1",
     "expo-status-bar": "~1.12.1",
     "firebase": "^10.12.2",
     "module-alias": "^2.2.3",
@@ -40,8 +41,7 @@
     "react-native-screens": "3.31.1",
     "react-native-web": "^0.19.12",
     "react-phone-number-input": "^3.4.3",
-    "scheduler": "^0.23.2",
-    "expo-sharing": "~12.0.1"
+    "scheduler": "^0.23.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

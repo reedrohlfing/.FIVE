@@ -41,6 +41,75 @@ export const sendBurstNotification = onCall((data, context) => {
   }
 });
 
+// Cloud Function to manage recently added buds
+export const addBudNotification = onCall((data, context) => {
+  try {
+    const { userId, budId } = data.data;
+    const budRef = db.doc(`users/${budId}`);
+
+    // Get the current data from the budRef document
+    return budRef.get().then((doc) => {
+      if (doc.exists) {
+        // Append the userId to the recentlyAdded field
+        const recentlyAdded = doc.data().recentlyAdded || [];
+        recentlyAdded.push(userId);
+
+        // Update the budRef document with the new recentlyAdded field
+        return budRef.update({ recentlyAdded });
+      } else {
+        throw new HttpsError(
+          "not-found",
+          "Bud document not found",
+          "Bud document not found"
+        );
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    throw new HttpsError(
+      "internal",
+      "Error sending addBud notification",
+      error
+    );
+  }
+});
+
+// Cloud Function to remove the buds from each others lists
+export const removeBudNotification = onCall((data, context) => {
+  try {
+    const { userId, budId } = data.data;
+    const budRef = db.doc(`users/${budId}`);
+    const userRef = db.doc(`users/${userId}`);
+
+    const removeBud = async (ref, idToRemove, field) => {
+      const doc = await ref.get();
+      if (doc.exists) {
+        const list = doc.data()[field] || [];
+        const updatedList = list.filter((id) => id !== idToRemove);
+        await ref.update({ [field]: updatedList });
+      } else {
+        throw new HttpsError(
+          "not-found",
+          "Document not found",
+          "Document not found"
+        );
+      }
+    };
+
+    return Promise.all([
+      removeBud(budRef, userId, "recentlyAdded"),
+      removeBud(userRef, budId, "recentlyAdded"),
+      removeBud(budRef, userId, "buds"),
+      removeBud(userRef, budId, "buds"),
+    ]).then(() => {
+      return { success: true };
+    });
+  } catch (error) {
+    console.log(error);
+    throw new HttpsError("internal", "Error removing bud notification", error);
+  }
+});
+
 // /**
 //  * Initiate a recursive delete of documents at a given path.
 //  *

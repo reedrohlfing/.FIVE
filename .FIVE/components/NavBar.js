@@ -13,14 +13,17 @@ const NavBar = () => {
   const { profileData } = useProfileData();
   return (
     <Tab.Navigator
-      styles={styles.navigator}
-      screenOptions={{ headerShown: false }}
+      screenOptions={{
+        headerShown: false,
+        tabBarOnMagicTap: true,
+        tabBarShowLabel: false,
+        tabBarStyle: styles.navigator,
+      }}
     >
       <Tab.Screen
         name="Feed"
         component={Feed}
         options={{
-          tabBarShowLabel: false,
           tabBarIcon: ({ focused }) => (
             <Image
               style={styles.button}
@@ -29,6 +32,7 @@ const NavBar = () => {
                   ? require("../assets/icons/feed-circle-black-active.png")
                   : require("../assets/icons/feed-circle-black-inactive.png")
               }
+              on
             />
           ),
         }}
@@ -37,7 +41,6 @@ const NavBar = () => {
         name="Search"
         component={Search}
         options={{
-          tabBarShowLabel: false,
           tabBarIcon: ({ focused }) => (
             <Image
               style={styles.button}
@@ -54,7 +57,6 @@ const NavBar = () => {
         name="Capture"
         component={Capture}
         options={{
-          tabBarShowLabel: false,
           tabBarIcon: ({ focused }) => (
             <Image
               style={styles.button}
@@ -71,7 +73,6 @@ const NavBar = () => {
         name="Bursts"
         component={Bursts}
         options={{
-          tabBarShowLabel: false,
           tabBarIcon: ({ focused }) => (
             <Image
               style={styles.button}
@@ -88,7 +89,6 @@ const NavBar = () => {
         name="Profile"
         component={Profile}
         options={{
-          tabBarShowLabel: false,
           tabBarIcon: ({ focused }) => (
             <Image
               style={
@@ -107,8 +107,17 @@ const NavBar = () => {
 
 const styles = StyleSheet.create({
   navigator: {
-    flex: 1,
     backgroundColor: "#fff",
+    width: "85%",
+    borderRadius: 32,
+    alignSelf: "center",
+    position: "absolute",
+    bottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    marginHorizontal: "auto",
   },
   button: {
     width: 32,

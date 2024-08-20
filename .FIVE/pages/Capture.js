@@ -26,6 +26,8 @@ import {
   FIREBASE_DB,
   FIREBASE_AUTH,
 } from "../FirebaseConfig";
+import { Bubble } from "../components/Bubble";
+import zIndex from "@mui/material/styles/zIndex";
 
 const Capture = () => {
   const { defaultData, profileData, setProfileData, updateProfile } =
@@ -178,9 +180,8 @@ const Capture = () => {
               pressed={pressed}
               onTouchStart={() => setPressed(true)}
               onTouchEnd={() => setPressed(false)}
-              on
             >
-              <View style={[styles.innerCircle]}></View>
+              {/* <View style={[styles.innerCircle]}></View> */}
               <View
                 style={[
                   styles.uploadButtonPlus,
@@ -195,6 +196,21 @@ const Capture = () => {
                   pressed && styles.uploadButtonPlusPressed,
                 ]}
               ></View>
+              <View
+                style={[
+                  styles.uploadButtonPlusBlur,
+                  styles.plusHorizontal,
+                  pressed && styles.uploadButtonPlusPressed,
+                ]}
+              ></View>
+              <View
+                style={[
+                  styles.uploadButtonPlusBlur,
+                  styles.plusVertical,
+                  pressed && styles.uploadButtonPlusPressed,
+                ]}
+              ></View>
+              <Bubble />
             </Pressable>
           )}
         </View>
@@ -215,14 +231,17 @@ const styles = StyleSheet.create({
   },
   uploadButton: {
     borderRadius: "50%",
-    border: "4px solid black",
+    //border: "4px solid black",
     alignSelf: "center",
     justifyContent: "center",
     height: outerCircleDiameter,
     maxHeight: 474,
     width: outerCircleDiameter,
     maxWidth: 474,
-    backgroundColor: "#F6F6F6",
+    backgroundColor: "black",
+  },
+  uploadButtonPressed: {
+    backgroundColor: "rgba(0,50,50,0.8)",
   },
   loading: {
     border: "none",
@@ -238,19 +257,25 @@ const styles = StyleSheet.create({
     width: innerCircleDiameter,
     maxWidth: 474,
     backgroundColor: "transparent",
-  },
-  uploadButtonPressed: {
-    backgroundColor: "black",
+    strokeLinecap: "round",
   },
   uploadButtonPlus: {
     textAlign: "center",
     alignSelf: "center",
-    backgroundColor: "black",
+    backgroundColor: "rgba(0,255,255,1)",
+    borderRadius: 4,
+    position: "absolute",
+    zIndex: 5,
+  },
+  uploadButtonPlusBlur: {
+    textAlign: "center",
+    alignSelf: "center",
+    backgroundColor: "rgba(0,255,255,1)",
     borderRadius: 4,
     position: "absolute",
   },
   uploadButtonPlusPressed: {
-    backgroundColor: "white",
+    backgroundColor: "rgba(255,255,255,0.8)",
   },
   plusHorizontal: {
     height: 4,

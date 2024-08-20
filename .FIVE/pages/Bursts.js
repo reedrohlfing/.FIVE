@@ -28,10 +28,11 @@ const Bursts = () => {
   // Listen for new burst notifications
   useEffect(() => {
     if (burstsRef) {
-      onSnapshot(burstsRef, (snapshot) => {
+      const unsubscribe = onSnapshot(burstsRef, (snapshot) => {
         const notifications = snapshot.docs.map((doc) => doc.data());
         setBurstNotifications(notifications);
       });
+      return unsubscribe;
     }
   }, []);
 
@@ -55,33 +56,60 @@ const Bursts = () => {
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Bursts</Text>
-      <FlatList
-        style={styles.notificationList}
-        data={burstNotifications}
-        renderItem={({ item }) => (
-          <Pressable
-            style={styles.notification}
-            onPress={() =>
-              navigation.navigate("Bud", { userId: item.senderId })
-            }
-          >
-            {users[item.senderId] && (
-              <Image
-                source={{ uri: users[item.senderId].profileImage }}
-                style={styles.profileImage}
-              />
-            )}
-            <View>
+      {burstNotifications.length > 0 ? (
+        <FlatList
+          style={styles.notificationList}
+          data={burstNotifications}
+          renderItem={({ item }) => (
+            <Pressable style={styles.notification}>
+              <Pressable
+                onPress={() =>
+                  navigation.navigate("Bud", { userId: item.senderId })
+                }
+              >
+                {users[item.senderId] && (
+                  <Image
+                    source={{ uri: users[item.senderId].profileImage }}
+                    style={styles.profileImage}
+                  />
+                )}
+              </Pressable>
               {users[item.senderId] && (
                 <Text style={styles.name}>
                   {users[item.senderId].firstName}{" "}
                   {users[item.senderId].lastName}
                 </Text>
               )}
+              <View style={styles.fwdButton}>
+                <Image
+                  style={styles.fwdButtonImg}
+                  source={require("../assets/icons/forward-inactive.png")}
+                />
+              </View>
+            </Pressable>
+          )}
+        />
+      ) : (
+        <View style={styles.noNotificationsFrame}>
+          <View style={styles.noNotifications}>
+            <Text style={styles.noNotificationsHeader}>
+              No burst notifications yet
+            </Text>
+            <View style={styles.burstDescView}>
+              <View style={styles.burstButton}>
+                <Image
+                  style={styles.burstButtonImg}
+                  source={require("../assets/icons/burst2-black-inactive.png")}
+                />
+              </View>
+              <Text style={styles.noNotificationsText}>
+                To burst someone, go to their profile and click the burst button
+                in the lower right-hand corner.
+              </Text>
             </View>
-          </Pressable>
-        )}
-      />
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -99,6 +127,7 @@ const styles = StyleSheet.create({
   },
   notificationList: {
     marginTop: 6,
+    paddingBottom: 80,
   },
   notification: {
     flexDirection: "row",
@@ -116,6 +145,61 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 16,
     fontWeight: "bold",
+  },
+  fwdButton: {
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#F6F6F6",
+    borderRadius: "50%",
+    height: 40,
+    width: 40,
+    marginLeft: "auto",
+  },
+  fwdButtonImg: {
+    height: 24,
+    width: 24,
+  },
+  noNotificationsFrame: {
+    marginVertical: 20,
+    paddingVertical: 50,
+    height: "75%",
+    width: "80%",
+    alignSelf: "center",
+  },
+  noNotifications: {
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  burstDescView: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  noNotificationsHeader: {
+    fontSize: 18,
+    fontWeight: "bold",
+    justifyContent: "top",
+    marginBottom: 16,
+  },
+  noNotificationsText: {
+    fontSize: 16,
+    justifyContent: "center",
+  },
+  burstButton: {
+    margin: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#F6F6F6",
+    borderRadius: "50%",
+    height: 56,
+    width: 56,
+  },
+  burstButtonImg: {
+    height: 34,
+    width: 34,
   },
 });
 

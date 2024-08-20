@@ -32,6 +32,7 @@ const defaultData = {
   profileImage: require("./assets/icons/add-black-active.png"),
   profileImageLarge: require("./assets/icons/add-black-active.png"),
   profileImageRef: "",
+  recentlyAdded: [],
   buds: [],
   iBursted: [],
 };

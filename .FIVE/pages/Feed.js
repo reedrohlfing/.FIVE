@@ -1,5 +1,6 @@
 import {
   StyleSheet,
+  Image,
   Text,
   View,
   ActivityIndicator,
@@ -89,11 +90,22 @@ const Feed = () => {
           {postsAvail ? (
             <ImgFeed style={styles.feed} />
           ) : (
-            <Text
-              style={{ textAlign: "center", alignContent: "center", flex: 1 }}
-            >
-              No posts available :(
-            </Text>
+            <View style={styles.noPostsFrame}>
+              <View style={styles.noPosts}>
+                <Text style={styles.noPostsHeader}>No posts yet</Text>
+                <View style={styles.postDescView}>
+                  <Image
+                    style={styles.addButtonImg}
+                    source={require("../assets/icons/add-dblue.png")}
+                  />
+                  <Text style={styles.noPostsText}>
+                    To see posts, add a few friends by searching for their
+                    profile and clicking the add button in the upper right-hand
+                    corner.
+                  </Text>
+                </View>
+              </View>
+            </View>
           )}
         </ScrollView>
       )}
@@ -108,10 +120,45 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
+    paddingBottom: 80,
   },
   feed: {
     width: "100%",
     marginHorizontal: 13,
+  },
+  noPostsFrame: {
+    marginVertical: 20,
+    paddingVertical: 50,
+    height: "75%",
+    width: "80%",
+    alignSelf: "center",
+  },
+  noPosts: {
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  postDescView: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  noPostsHeader: {
+    fontSize: 18,
+    fontWeight: "bold",
+    justifyContent: "top",
+    marginBottom: 16,
+  },
+  noPostsText: {
+    fontSize: 16,
+    justifyContent: "center",
+  },
+  addButtonImg: {
+    height: 56,
+    width: 56,
+    margin: 10,
   },
 });
 

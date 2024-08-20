@@ -145,6 +145,7 @@ const styles = StyleSheet.create({
   },
   searchResults: {
     marginTop: 12,
+    paddingBottom: 80,
   },
   userContainer: {
     flexDirection: "row",

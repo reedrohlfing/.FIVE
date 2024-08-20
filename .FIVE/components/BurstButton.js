@@ -51,9 +51,9 @@ const BurstButton = ({ budId }) => {
   };
 
   return (
-    <Pressable style={styles.backButton} onPress={() => handleBurst()}>
+    <Pressable style={styles.burstButton} onPress={() => handleBurst()}>
       <Image
-        style={styles.backButtonImg}
+        style={styles.burstButtonImg}
         source={
           pressed
             ? require("../assets/icons/burst2-black-active.png")
@@ -65,7 +65,7 @@ const BurstButton = ({ budId }) => {
 };
 
 const styles = StyleSheet.create({
-  backButton: {
+  burstButton: {
     position: "absolute",
     bottom: 0,
     right: 0,
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     height: 56,
     width: 56,
   },
-  backButtonImg: {
+  burstButtonImg: {
     height: 34,
     width: 34,
   },

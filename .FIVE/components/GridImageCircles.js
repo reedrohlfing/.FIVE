@@ -37,10 +37,6 @@ const GridImageCircles = ({ navigation, userId }) => {
     return unsubscribe;
   }, []);
 
-  const handleBubblePress = (post) => {
-    navigation.navigate("PostModal", { userId, post: post.datetime });
-  };
-
   const size = Dimensions.get("window").width / 2.4;
   return (
     <ScrollView
@@ -54,7 +50,12 @@ const GridImageCircles = ({ navigation, userId }) => {
           <Pressable
             key={index}
             style={styles.gridItem}
-            onPress={() => handleBubblePress(circle)}
+            onPress={() =>
+              navigation.navigate("PostModal", {
+                userId,
+                post: circle.datetime,
+              })
+            }
           >
             <Image
               source={{ uri: circle.postURL }}
@@ -77,6 +78,7 @@ const GridImageCircles = ({ navigation, userId }) => {
 const styles = StyleSheet.create({
   bubblesScroll: {
     backgroundColor: "white",
+    paddingBottom: 80,
   },
   bubblesContainer: {
     paddingVertical: 4,
